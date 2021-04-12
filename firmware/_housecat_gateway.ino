@@ -12,13 +12,13 @@
 #include "housecat_inputs.h"
 #include "housecat_input_button.h"
 
-housecat_outputs outputs;
-housecat_inputs inputs;
+housecatOutputs outputs;
+housecatInputs inputs;
 
 static bool eth_connected = false;
 static bool input_interrupt = false;
 
-ModbusIP mb;              // Declare ModbusTCP instance
+ModbusIP modbus_tcp;
 
 
 void IRAM_ATTR inputs_interrupt_callback()
@@ -31,6 +31,7 @@ void setup()
   pinMode(LED_PIN, OUTPUT);
   Serial.begin(115200);
   Wire.begin(I2C_SDA_PIN, I2C_SCL_PIN, 400000);
+  //scan_i2c();
   delay(50);
   ethernetInit();
 
@@ -38,21 +39,35 @@ void setup()
   inputs.init();
   pinMode(INPUT_INT_PIN, INPUT);
   attachInterrupt(INPUT_INT_PIN, inputs_interrupt_callback, FALLING);
-  //scan_i2c();
-
-  mb.server();              // Act as Modbus TCP server
-  mb.addReg(HREG(100));     // Add Holding register #100
+  outputs.set(24, HIGH);
+  
+  modbus_tcp.server();              // Act as Modbus TCP server
+  modbus_tcp.addReg(HREG(100));     // Add Holding register #100
+  modbus_tcp.addCoil(0);            // Add Coil #0
 }
 
 void loop()
 {
-  mb.task();
+  static unsigned long timer = 0;
+  static bool status_led = false;
+  
+  modbus_tcp.task();
 
   if (input_interrupt || (digitalRead(INPUT_INT_PIN) == LOW))
   {
     Serial.println("Input interrupt");
-    inputs.interrupt_callback();
+    inputs.interruptCallback();
     input_interrupt = false;
+  }
+
+  outputs.set(8, modbus_tcp.Coil(0));  //Read coil
+
+  if((millis() - timer) > 1000) //run every second;
+  {
+    timer = millis();
+    digitalWrite(LED_PIN, status_led);
+    //modbus_tcp.Coil(0, status_led); //Write coil
+    status_led = !status_led;
   }
 }
 

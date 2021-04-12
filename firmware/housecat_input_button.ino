@@ -15,7 +15,6 @@ void housecat_input_button::poll()
   {
     
   }
-  
 }
 
 uint8_t housecat_input_button::short_press()
