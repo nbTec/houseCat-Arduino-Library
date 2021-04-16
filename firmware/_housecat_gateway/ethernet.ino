@@ -1,8 +1,5 @@
 //WiFiServer server(80);
 
-#define ETH_ENABLE_PIN  13
-//#define ETH_POWER_PIN   13
-
 void ethernetInit()
 {
   pinMode(ETH_ENABLE_PIN, OUTPUT);

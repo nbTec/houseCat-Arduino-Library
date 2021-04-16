@@ -1,6 +1,9 @@
 
+#ifndef _HOUSECAT_INPUTS_H_
+#define _HOUSECAT_INPUTS_H_
+
 #include <Wire.h>
-#include "Adafruit_MCP23017.h"
+#include "../Adafruit_MCP23017/Adafruit_MCP23017.h"
 
 class housecatInputs
 {
@@ -18,4 +21,7 @@ class housecatInputs
     housecatInputs();
     void init();
     void interruptCallback();
+    bool read(uint8_t input);
 };
+
+#endif

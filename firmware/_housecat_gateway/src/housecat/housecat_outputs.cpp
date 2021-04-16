@@ -1,4 +1,18 @@
 
+#ifdef __AVR
+  #include <avr/pgmspace.h>
+#elif defined(ESP8266)
+  #include <pgmspace.h>
+#endif
+
+#include "housecat_outputs.h"
+
+#if ARDUINO >= 100
+#include "Arduino.h"
+#else
+#include "WProgram.h"
+#endif
+
 housecatOutputs::housecatOutputs()
 {
   m_mapping[0][0] = 0;
@@ -76,12 +90,17 @@ void housecatOutputs::init()
     for (int j = 0; j < m_ioExpanderPins; j++)
     {
       m_ioExpander[i].pinMode(j, OUTPUT);
-      m_ioExpander[i].digitalWrite(j, LOW);
+      m_output[m_mapping[i][j]] = m_ioExpander[i].digitalRead(j); //Restore current state of outputs
     }
   }
 }
 
-void housecatOutputs::set(uint8_t output, uint8_t state)
+bool housecatOutputs::read(uint8_t output)
+{
+  return m_output[output];
+}
+
+void housecatOutputs::write(uint8_t output, bool state)
 {
   for (int i = 0; i < m_ioExpanderQuantity; i++)
   {
@@ -99,16 +118,19 @@ void housecatOutputs::set(uint8_t output, uint8_t state)
   }
 }
 
-void housecatOutputs::toggle(uint8_t output)
+void housecatOutputs::toggle(uint8_t output, bool toggle)
 {
-  for (int i = 0; i < m_ioExpanderQuantity; i++)
+  if (toggle)
   {
-    for (int j = 0; j < m_ioExpanderPins; j++)
+    for (int i = 0; i < m_ioExpanderQuantity; i++)
     {
-      if (m_mapping[i][j] == (output - 1))
+      for (int j = 0; j < m_ioExpanderPins; j++)
       {
+        if (m_mapping[i][j] == (output - 1))
+        {
           m_output[m_mapping[i][j]] = !m_output[m_mapping[i][j]];
           m_ioExpander[i].digitalWrite(j, m_output[m_mapping[i][j]]);
+        }
       }
     }
   }

@@ -1,4 +1,18 @@
 
+#ifdef __AVR
+  #include <avr/pgmspace.h>
+#elif defined(ESP8266)
+  #include <pgmspace.h>
+#endif
+
+#include "housecat_inputs.h"
+
+#if ARDUINO >= 100
+#include "Arduino.h"
+#else
+#include "WProgram.h"
+#endif
+
 housecatInputs::housecatInputs()
 {
   m_mapping[0][0] = 7;
@@ -92,12 +106,20 @@ void housecatInputs::interruptCallback()
     {
       value = m_ioExpander[i].getLastInterruptPinValue();
       m_input[m_mapping[i][interrupt_pin]] = value;
-      Serial.print("IO Expander: ");
+      /*Serial.print("IO Expander: ");
       Serial.print(i);
       Serial.print(", Input: ");
       Serial.print(m_mapping[i][interrupt_pin]);
       Serial.print(", Value: ");
-      Serial.println(value);
+      Serial.println(value);*/
     }
   }
+}
+
+bool housecatInputs::read(uint8_t input)
+{
+  if (input <= ((m_ioExpanderQuantity * m_ioExpanderPins) + 1))
+    return m_input[input - 1];
+  else
+    return false;
 }
