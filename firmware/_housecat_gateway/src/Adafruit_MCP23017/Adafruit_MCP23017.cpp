@@ -112,8 +112,8 @@ void Adafruit_MCP23017::begin(uint8_t addr) {
 
 	// set defaults!
 	// all inputs on port A and B
-	writeRegister(MCP23017_IODIRA,0xff);
-	writeRegister(MCP23017_IODIRB,0xff);
+	//writeRegister(MCP23017_IODIRA,0xff);
+	//writeRegister(MCP23017_IODIRB,0xff);
 }
 
 /**
@@ -140,6 +140,27 @@ uint16_t Adafruit_MCP23017::readGPIOAB() {
 	// read the current GPIO output latches
 	Wire.beginTransmission(MCP23017_ADDRESS | i2caddr);
 	wiresend(MCP23017_GPIOA);
+	Wire.endTransmission();
+
+	Wire.requestFrom(MCP23017_ADDRESS | i2caddr, 2);
+	a = wirerecv();
+	ba = wirerecv();
+	ba <<= 8;
+	ba |= a;
+
+	return ba;
+}
+
+/**
+ * Reads all 16 pins OLAT (port A and B) into a single 16 bits variable.
+ */
+uint16_t Adafruit_MCP23017::readOLATAB() {
+	uint16_t ba = 0;
+	uint8_t a;
+
+	// read the current GPIO output latches
+	Wire.beginTransmission(MCP23017_ADDRESS | i2caddr);
+	wiresend(MCP23017_OLATA);
 	Wire.endTransmission();
 
 	Wire.requestFrom(MCP23017_ADDRESS | i2caddr, 2);

@@ -17,8 +17,8 @@ class housecatInputButton
     bool m_shortPress;
     bool m_longPress;
 
-    enum enum_input_state {rising_edge, rising_edge_holdoff, falling_edge, falling_edge_holdoff, long_press_wait};
-    enum_input_state m_inputState = rising_edge;
+    enum enum_inputState {rising_edge, rising_edge_holdoff, falling_edge, falling_edge_holdoff, long_press_wait};
+    enum_inputState m_inputState = rising_edge;
 
     unsigned long readTime();
 

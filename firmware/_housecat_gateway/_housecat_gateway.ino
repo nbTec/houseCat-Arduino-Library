@@ -10,10 +10,10 @@ housecatInputs inputs;
 
 //Input button declaration
 housecatInputButton buttonHallway_1(inputs, 1);
-housecatInputButton buttonHallway_2(inputs, 2);
+housecatInputButton buttonHallway_2(inputs, 54);
 
 //Output relay declaration
-housecatOutputRelay lightHallway(outputs, 7);
+housecatOutputRelay lightHallway(outputs, 23);
 
 static bool eth_connected = false;
 static bool input_interrupt = false;

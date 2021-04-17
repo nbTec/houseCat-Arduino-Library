@@ -18,18 +18,19 @@ housecatOutputRelay::housecatOutputRelay(housecatOutputs &outputs, uint8_t outpu
 
 }
 
-void housecatOutputRelay::poll(bool toggle)
+void housecatOutputRelay::poll(bool toggleInput)
 {
+  uint8_t toggle_pressed = toggleInput && (!m_toggleInputPrv);
   if (m_firstPoll)
   {
     m_outputState = m_outputs.read(m_outputNumber); //Update output state
     m_firstPoll = false;
   }
 
-  if (toggle && (!m_togglePrv))
+  if (toggle_pressed)
   {
     m_outputState = !m_outputState;
     m_outputs.write(m_outputNumber, m_outputState);
   }
-  m_togglePrv = toggle;
+  m_toggleInputPrv = toggleInput;
 }

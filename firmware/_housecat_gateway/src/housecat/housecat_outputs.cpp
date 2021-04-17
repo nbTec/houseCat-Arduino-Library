@@ -84,20 +84,24 @@ housecatOutputs::housecatOutputs()
 
 void housecatOutputs::init()
 {
+  uint16_t current_value = 0;
+  
   for (int i = 0; i < m_ioExpanderQuantity; i++)
   {
     m_ioExpander[i].begin(i + m_i2cBaseAddress);
+	current_value = m_ioExpander[i].readOLATAB();
     for (int j = 0; j < m_ioExpanderPins; j++)
     {
+	  m_output[m_mapping[i][j]] = ((current_value >> j) & 0x01); //Restore current state of outputs
       m_ioExpander[i].pinMode(j, OUTPUT);
-      m_output[m_mapping[i][j]] = m_ioExpander[i].digitalRead(j); //Restore current state of outputs
+
     }
   }
 }
 
 bool housecatOutputs::read(uint8_t output)
 {
-  return m_output[output];
+  return m_output[output - 1];
 }
 
 void housecatOutputs::write(uint8_t output, bool state)

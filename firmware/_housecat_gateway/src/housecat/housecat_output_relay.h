@@ -13,12 +13,12 @@ class housecatOutputRelay
     bool m_outputState = false;
 
     bool m_firstPoll = true;
-    bool m_togglePrv = false;
+    bool m_toggleInputPrv = false;
 
   public:
     housecatOutputRelay(housecatOutputs &outputs, uint8_t outputNumber);
 
-    void poll(bool toggle);
+    void poll(bool toggleInput);
 };
 
 #endif

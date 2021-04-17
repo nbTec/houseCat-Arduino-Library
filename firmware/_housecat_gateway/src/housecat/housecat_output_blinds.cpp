@@ -18,24 +18,45 @@ housecatOutputBlinds::housecatOutputBlinds(housecatOutputs &outputs, uint8_t out
 
 }
 
-void housecatOutputBlinds::poll(bool up, bool down)
+void housecatOutputBlinds::poll(bool upInput, bool downInput)
 {
+  uint8_t up_pressed = upInput && (!m_upInputPrv);
+  uint8_t down_pressed = downInput && (!m_downInputPrv);
+  
   if (m_firstPoll)
   {
 
     m_firstPoll = false;
   }
-
-  if (up && (!m_upPrv))
+  
+  switch(m_blindsState)
   {
-
+	  case stop:
+		m_outputs.write(m_outputNumber_1, false);
+		m_outputs.write(m_outputNumber_2, false);
+	  break;
+	  
+	  case up:
+	  
+	  break;
+	  
+	  case fully_up:
+	  
+	  break;
+	  
+	  case down:
+	  
+	  break;
+	  
+	  case fully_down:
+	  
+	  break;
+	  
+	  default:
+		m_blindsState = stop;
+	  break;
   }
   
-  if (down && (!m_downPrv))
-  {
-
-  }
-  
-  m_upPrv = up;
-  m_downPrv = down;
+  m_upInputPrv = up;
+  m_downInputPrv = down;
 }
