@@ -12,15 +12,15 @@ class housecatOutputBlinds
 	uint8_t m_type = 0;
 	uint16_t m_travelTimer = 30; //Travel time in seconds
 
-    uint8_t m_outputNumber_1 = 0;
+  uint8_t m_outputNumber_1 = 0;
 	uint8_t m_outputNumber_2 = 0;
 	
 	enum enumBlindsState {stop, up, fully_up, down, fully_down};
 	enumBlindsState m_blindsState = stop;
 
-    bool m_firstPoll = true;
+  bool m_firstPoll = true;
 	
-    bool m_upInputPrv = false;
+  bool m_upInputPrv = false;
 	bool m_downInputPrv = false;
 
   public:

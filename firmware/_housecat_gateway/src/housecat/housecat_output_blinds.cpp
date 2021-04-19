@@ -29,15 +29,19 @@ void housecatOutputBlinds::poll(bool upInput, bool downInput)
     m_firstPoll = false;
   }
   
-  switch(m_blindsState)
+  switch (m_blindsState)
   {
 	  case stop:
 		m_outputs.write(m_outputNumber_1, false);
 		m_outputs.write(m_outputNumber_2, false);
+		if (up_pressed)
+		{
+			
+		}
 	  break;
-	  
+	
 	  case up:
-	  
+
 	  break;
 	  
 	  case fully_up:

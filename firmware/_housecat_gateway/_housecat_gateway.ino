@@ -5,8 +5,9 @@
 
 #include "_housecat_gateway.h"
 
-housecatOutputs outputs;
 housecatInputs inputs;
+housecatOutputs outputs;
+housecatAnalogOutputs analog_outputs;
 
 //Input button declaration
 housecatInputButton buttonHallway_1(inputs, 1);
@@ -14,6 +15,7 @@ housecatInputButton buttonHallway_2(inputs, 54);
 
 //Output relay declaration
 housecatOutputRelay lightHallway(outputs, 23);
+
 
 static bool eth_connected = false;
 static bool input_interrupt = false;
@@ -36,10 +38,21 @@ void setup()
   delay(50);
   ethernetInit();
 
-  outputs.init();
   inputs.init();
+  outputs.init();
+  analog_outputs.init();
+  
   pinMode(INPUT_INT_PIN, INPUT);
   attachInterrupt(INPUT_INT_PIN, inputs_interrupt_callback, FALLING);
+
+  analog_outputs.write(1,1);
+  analog_outputs.write(2,2);
+  analog_outputs.write(3,3);
+  analog_outputs.write(4,4);
+  analog_outputs.write(5,5);
+  analog_outputs.write(6,6);
+  analog_outputs.write(7,7);
+  analog_outputs.write(8,8);
 
   modbus_tcp.server();              // Act as Modbus TCP server
   modbus_tcp.addReg(HREG(100));     // Add Holding register #100
@@ -101,7 +114,7 @@ void modbusHandler()
 
   modbus_tcp.task();
   outputs.write(8, modbus_tcp.Coil(0));  //Read coil and write to output
-  
+
 
   if ((millis() - timer) > 1000) //run every second;
   {

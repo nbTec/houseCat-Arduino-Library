@@ -9,4 +9,6 @@
 #include "housecat_output_relay.h"
 #include "housecat_output_blinds.h"
 
+#include "housecat_analog_outputs.h"
+
 #endif
