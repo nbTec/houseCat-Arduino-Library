@@ -30,6 +30,11 @@ void housecatAnalogOutputs::init()
   m_dac.begin(i2cAddress, true);
 }
 
+float housecatAnalogOutputs::readFullScale()
+{
+  return m_fullScale;
+}
+
 float housecatAnalogOutputs::read(uint8_t output)
 {
   return m_output[output - 1];
@@ -40,8 +45,12 @@ void housecatAnalogOutputs::write(uint8_t output, float value)
  if((0 < output) && (output <= m_dacOutputs))
  {
     output -= 1;
-    uint16_t dac_value = (uint16_t) (((value / (float) m_externalGain) / m_fullScale ) * (float) m_resolution);
-    m_dac.writeDAC(dac_value, m_mapping[output]);
-    m_output[output] = value;
+    if(m_output[output] != value)
+    {
+      uint16_t dac_value = (uint16_t) (((value / (float) m_externalGain) / m_dacFullScale ) * (float) m_dacResolution);
+      m_dac.writeDAC(dac_value, m_mapping[output]);
+      m_output[output] = value;
+    } 
  }
 }
+

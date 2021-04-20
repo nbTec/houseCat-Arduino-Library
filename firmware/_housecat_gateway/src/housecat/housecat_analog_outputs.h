@@ -10,9 +10,10 @@ class housecatAnalogOutputs
   private:
     static const uint8_t i2cAddress = 0x4A;
     static const uint8_t m_dacOutputs = 8;
-    static const uint16_t m_resolution = 0xFFF;
-    const float m_fullScale = 5.00;
+    static const uint16_t m_dacResolution = 0xFFF;
+    const float m_dacFullScale = 5.00;
     static const uint8_t m_externalGain = 4;
+    const float m_fullScale = 10.0;
 
     DAC7678 m_dac;
     uint8_t m_mapping[m_dacOutputs];
@@ -21,6 +22,7 @@ class housecatAnalogOutputs
   public:
     housecatAnalogOutputs();
     void init();
+    float readFullScale();
     float read(uint8_t output);
     void write(uint8_t output, float value);
 };

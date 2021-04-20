@@ -21,6 +21,7 @@ housecatOutputRelay::housecatOutputRelay(housecatOutputs &outputs, uint8_t outpu
 void housecatOutputRelay::poll(bool toggleInput)
 {
   uint8_t toggle_pressed = toggleInput && (!m_toggleInputPrv);
+  
   if (m_firstPoll)
   {
     m_outputState = m_outputs.read(m_outputNumber); //Update output state

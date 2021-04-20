@@ -20,7 +20,7 @@ class housecatInputButton
     enum enum_inputState {rising_edge, rising_edge_holdoff, falling_edge, falling_edge_holdoff, long_press_wait};
     enum_inputState m_inputState = rising_edge;
 
-    unsigned long readTime();
+    unsigned long readTimeMs();
 
   public:
     housecatInputButton(housecatInputs &inputs, uint8_t inputNumber);

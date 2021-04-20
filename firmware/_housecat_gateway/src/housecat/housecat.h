@@ -10,5 +10,6 @@
 #include "housecat_output_blinds.h"
 
 #include "housecat_analog_outputs.h"
+#include "housecat_analog_output_dimmer.h"
 
 #endif

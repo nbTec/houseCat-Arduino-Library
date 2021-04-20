@@ -18,7 +18,7 @@ housecatInputButton::housecatInputButton(housecatInputs &inputs, uint8_t inputNu
 
 }
 
-unsigned long housecatInputButton::readTime()
+unsigned long housecatInputButton::readTimeMs()
 {
   return millis();
 }
@@ -33,12 +33,12 @@ void housecatInputButton::poll()
       if (m_inputs.read(m_inputNumber))
       {
         m_inputState = rising_edge_holdoff;
-        m_timerPrv = readTime();
+        m_timerPrv = readTimeMs();
       }
       break;
 
     case rising_edge_holdoff:
-      if ((readTime() - m_timerPrv) > m_holdOffTimeMs)
+      if ((readTimeMs() - m_timerPrv) > m_holdOffTimeMs)
       {
         if (m_inputs.read(m_inputNumber))
         {
@@ -50,16 +50,16 @@ void housecatInputButton::poll()
     case falling_edge:
       if (!m_inputs.read(m_inputNumber))
       {
-        if ((readTime() - m_timerPrv) <= m_longPressTimeMs)
+        if ((readTimeMs() - m_timerPrv) <= m_longPressTimeMs)
         {
           m_shortPress = true;
-          m_timerPrv = readTime();
+          m_timerPrv = readTimeMs();
           m_inputState = falling_edge_holdoff;
         }
       }
       else
       {
-        if ((readTime() - m_timerPrv) > m_longPressTimeMs)
+        if ((readTimeMs() - m_timerPrv) > m_longPressTimeMs)
         {
           m_longPress = true;
           m_inputState = long_press_wait;
@@ -70,13 +70,13 @@ void housecatInputButton::poll()
     case long_press_wait:
       if (!m_inputs.read(m_inputNumber))
       {
-        m_timerPrv = readTime();
+        m_timerPrv = readTimeMs();
         m_inputState = falling_edge_holdoff;
       }
       break;
 
     case falling_edge_holdoff:
-      if ((readTime() - m_timerPrv) > m_holdOffTimeMs)
+      if ((readTimeMs() - m_timerPrv) > m_holdOffTimeMs)
       {
         m_inputState = rising_edge;
       }
