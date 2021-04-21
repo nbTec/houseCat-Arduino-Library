@@ -79,7 +79,6 @@ housecatOutputs::housecatOutputs()
   m_mapping[3][13] = 26;
   m_mapping[3][14] = 25;
   m_mapping[3][15] = 24;
-
 }
 
 void housecatOutputs::init()
@@ -89,7 +88,8 @@ void housecatOutputs::init()
   for (int i = 0; i < m_ioExpanderQuantity; i++)
   {
     m_ioExpander[i].begin(i + m_i2cBaseAddress);
-	current_value = m_ioExpander[i].readOLATAB();
+    current_value = m_ioExpander[i].readOLATAB();
+	  //current_value = m_ioExpander[i].readOutputsAB();
     for (int j = 0; j < m_ioExpanderPins; j++)
     {
 	  m_output[m_mapping[i][j]] = ((current_value >> j) & 0x01); //Restore current state of outputs

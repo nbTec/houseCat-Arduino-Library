@@ -1,20 +1,17 @@
 
-#include "src/housecat/housecat.h"
 #include <ETH.h>
-#include <ModbusIP_ESP8266.h>
+#include "src/housecat/housecat.h"
+#include "housecat_settings.h"
 
-#include "_housecat_gateway.h"
+//#include <ModbusIP_ESP8266.h>
 
-housecatInputs inputs;
-housecatOutputs outputs;
-housecatAnalogOutputs analog_outputs;
 
 //Input buttons
 housecatInputButton buttonHallway_1(inputs, 1);
 housecatInputButton buttonHallway_2(inputs, 54);
 
 //Output relays
-housecatOutputRelay lightHallway(outputs, 23);
+housecatOutputRelay lightHallway(outputs, protocol, 23);
 
 //Analog output dimmers
 housecatAnalogOutputDimmer dimmerLivingroom(analog_outputs, 1, 1.0, 7.0);
@@ -26,7 +23,7 @@ housecatOutputBlinds blindLivingRoom_1(outputs, 8, 61, 30);
 static bool eth_connected = false;
 static bool input_interrupt = false;
 
-ModbusIP modbus_tcp;
+//ModbusIP modbus_tcp;
 
 
 void IRAM_ATTR inputs_interrupt_callback()
@@ -44,23 +41,28 @@ void setup()
   delay(50);
   ethernetInit();
 
+  protocol.init();
   inputs.init();
   outputs.init();
   analog_outputs.init();
 
+  outputs.write(51, true);
+
   pinMode(INPUT_INT_PIN, INPUT);
   attachInterrupt(INPUT_INT_PIN, inputs_interrupt_callback, FALLING);
 
-  modbus_tcp.server();              // Act as Modbus TCP server
-  modbus_tcp.addReg(HREG(100));     // Add Holding register #100
-  modbus_tcp.addCoil(0);            // Add Coil #0
+  //modbus_tcp.server();              // Act as Modbus TCP server
+  //modbus_tcp.addReg(HREG(100));     // Add Holding register #100
+  //modbus_tcp.addCoil(0);            // Add Coil #0
 }
 
 
 void loop()
 {
+  protocol.poll();
+  
   inputHandler();
-  modbusHandler();
+  //modbusHandler();
   heartbeatLed();
 
   inputPolling();
@@ -79,7 +81,7 @@ void outputPolling()
 {
   lightHallway.poll(buttonHallway_1.longPress() or buttonHallway_1.shortPress() or buttonHallway_2.shortPress());
   dimmerLivingroom.poll(buttonHallway_1.shortPress(), buttonHallway_1.longPress());
-  blindLivingRoom_1.poll(buttonHallway_1.shortPress(), buttonHallway_1.longPress());
+  //blindLivingRoom_1.poll(buttonHallway_1.shortPress(), buttonHallway_1.longPress());
 }
 
 
@@ -106,6 +108,7 @@ void inputHandler()
   }
 }
 
+/*
 void modbusHandler()
 {
   static unsigned long timer = 0;
@@ -122,6 +125,7 @@ void modbusHandler()
     coil = !coil;
   }
 }
+*/
 
 void scanI2c()
 {
