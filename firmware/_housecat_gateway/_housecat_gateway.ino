@@ -3,8 +3,6 @@
 #include "src/housecat/housecat.h"
 #include "housecat_settings.h"
 
-//#include <ModbusIP_ESP8266.h>
-
 
 //Input buttons
 housecatInputButton buttonHallway_1(inputs, 1);
@@ -41,7 +39,10 @@ void setup()
   delay(50);
   ethernetInit();
 
+  //protocol.enableModbus();
+  protocol.enableMqtt();
   protocol.init();
+  
   inputs.init();
   outputs.init();
   analog_outputs.init();
