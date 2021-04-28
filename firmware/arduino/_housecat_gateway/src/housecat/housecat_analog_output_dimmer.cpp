@@ -13,7 +13,7 @@
 #include "WProgram.h"
 #endif
 
-housecatAnalogOutputDimmer::housecatAnalogOutputDimmer(housecatAnalogOutputs &analogOutputs, uint8_t outputNumber, float startValue, float currentValue)
+housecatAnalogOutputDimmer::housecatAnalogOutputDimmer(housecatAnalogOutputs &analogOutputs, uint8_t outputNumber, uint8_t startValue, uint8_t currentValue)
 : m_analogOutputs(analogOutputs), m_outputNumber(outputNumber), m_startValue(startValue), m_outputValue(currentValue)
 {
 }
@@ -38,7 +38,7 @@ void housecatAnalogOutputDimmer::poll(bool toggleInput, bool cycleInput)
     m_outputState = !m_outputState;
     if(m_outputState == true)
     {
-        m_analogOutputs.write(m_outputNumber, m_outputValue);
+        m_analogOutputs.write(m_outputNumber, m_outputValue / 10);
     }
     else
     {
@@ -57,7 +57,7 @@ void housecatAnalogOutputDimmer::poll(bool toggleInput, bool cycleInput)
             m_outputValue = m_startValue;
         }
 
-        m_analogOutputs.write(m_outputNumber, m_outputValue);
+        m_analogOutputs.write(m_outputNumber, m_outputValue / 10);
         m_prvCycleTimeMs = readTimeMs();
       }
   }

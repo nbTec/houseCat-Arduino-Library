@@ -42,7 +42,7 @@ float housecatAnalogOutputs::read(uint8_t output)
 
 void housecatAnalogOutputs::write(uint8_t output, float value)
 {
- if((0 < output) && (output <= m_dacOutputs))
+ if((output > 0) && (output <= m_dacOutputs))
  {
     output -= 1;
     if(m_output[output] != value)

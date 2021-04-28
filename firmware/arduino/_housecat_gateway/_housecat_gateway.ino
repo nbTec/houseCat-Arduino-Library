@@ -5,14 +5,14 @@
 
 
 //Input buttons
-housecatInputButton buttonHallway_1(inputs, 1);
-housecatInputButton buttonHallway_2(inputs, 54);
+housecatInputButton buttonHallway_1(inputs, protocol, 1);
+housecatInputButton buttonHallway_2(inputs, protocol, 54);
 
 //Output relays
 housecatOutputRelay lightHallway(outputs, protocol, 23);
 
 //Analog output dimmers
-housecatAnalogOutputDimmer dimmerLivingroom(analog_outputs, 1, 1.0, 7.0);
+housecatAnalogOutputDimmer dimmerLivingroom(analog_outputs, 1, 10, 70);
 
 //Blinds
 housecatOutputBlinds blindLivingRoom_1(outputs, 8, 61, 30);
@@ -41,6 +41,7 @@ void setup()
 
   //protocol.enableModbus();
   protocol.enableMqtt();
+
   protocol.init();
   
   inputs.init();

@@ -33,6 +33,23 @@ void housecatProtocol::enableMqtt()
   m_modbusEnabled = false;
 }
 
+void housecatProtocol::mqttSetBroker(IPAddress brokerIp, int brokerPort)
+{
+  m_mqttBrokerIpAddress = brokerIp;
+  m_mqttBrokerPort = brokerPort;
+}
+
+void housecatProtocol::mqttSetBrokerCredentials(String username)
+{
+  m_mqttUsername = username;
+}
+
+void housecatProtocol::mqttSetBrokerCredentials(String username, String password)
+{
+  m_mqttUsername = username;
+  m_mqttPassword = password;
+}
+
 void housecatProtocol::init()
 {
   if(m_modbusEnabled)
@@ -50,6 +67,21 @@ void housecatProtocol::init()
 
 void housecatProtocol::mqttConnect()
 {
+  char mqtt_client_id[m_mqttClientId.length() + 1];
+  char mqtt_username[m_mqttUsername.length() + 1];
+  char mqtt_password[m_mqttPassword.length() + 1];
+
+  m_mqttClientId.toCharArray(mqtt_client_id, sizeof(mqtt_client_id));
+  m_mqttUsername.toCharArray(mqtt_username, sizeof(mqtt_username));
+  m_mqttPassword.toCharArray(mqtt_password, sizeof(mqtt_password));
+
+  if(m_mqttUsername.isEmpty())
+    m_mqttClient.connect(mqtt_client_id, false);
+  else if(m_mqttPassword.isEmpty())
+    m_mqttClient.connect(mqtt_client_id, mqtt_username, false);
+  else
+    m_mqttClient.connect(mqtt_client_id, mqtt_username, mqtt_password, false);
+    
   
   m_mqttClient.subscribe("/housecat/status");
   m_mqttClient.publish("/housecat/status", "Hello");
@@ -69,18 +101,58 @@ void housecatProtocol::mqttCallback(String &topic, String &payload)
   m_mqttReceivedPayload = payload;
 }
 
+void housecatProtocol::addInputButton(uint8_t input)
+{
+  if(m_modbusEnabled)
+  {
+    m_modbusTcp.addIsts(input);
+    m_modbusTcp.addIsts(input + 64);
+  }
+}
+
+void housecatProtocol::writeInputButtonShort(uint8_t input, bool state)
+{
+  if(m_modbusEnabled)
+  {
+    if(state)
+      m_modbusTcp.Ists(input, 1);
+    else
+      m_modbusTcp.Ists(input, 0);
+  }
+
+  if(m_mqttEnabled)
+  {
+    m_mqttInputsShort[input] = state;
+    String input_number = String(input);
+    String mqtt_topic = m_mqttInputsTopic + input_number + m_mqttInputButtonShortSubTopic;
+    m_mqttClient.publish(mqtt_topic, state ? "TRUE" : "FALSE");
+  }
+}
+
+void housecatProtocol::writeInputButtonLong(uint8_t input, bool state)
+{
+  if(m_modbusEnabled)
+  {
+    if(state)
+      m_modbusTcp.Ists(input + 64, 1);
+    else
+      m_modbusTcp.Ists(input + 64, 0);
+  }
+
+  if(m_mqttEnabled)
+  {
+    m_mqttInputsLong[input] = state;
+    String input_number = String(input);
+    String mqtt_topic = m_mqttInputsTopic + input_number + m_mqttInputButtonLongSubTopic;
+    m_mqttClient.publish(mqtt_topic, state ? "TRUE" : "FALSE");
+  }
+}
+
 void housecatProtocol::addOutput(uint8_t output)
 {
   if(m_modbusEnabled)
   {
     m_modbusTcp.addCoil(output);
-  }
-
-  if(m_mqttEnabled)
-  {
-    String output_number = String(output);
-    String mqtt_topic = m_mqttOutputsTopic + output_number;
-    m_mqttClient.subscribe(mqtt_topic);
   }
 }
 

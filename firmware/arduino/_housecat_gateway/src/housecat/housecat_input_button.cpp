@@ -13,7 +13,8 @@
 #include "WProgram.h"
 #endif
 
-housecatInputButton::housecatInputButton(housecatInputs &inputs, uint8_t inputNumber): m_inputs(inputs), m_inputNumber(inputNumber)
+housecatInputButton::housecatInputButton(housecatInputs &inputs, housecatProtocol &protocol, uint8_t inputNumber)
+: m_inputs(inputs), m_protocol(protocol), m_inputNumber(inputNumber)
 {
 
 }
@@ -25,7 +26,13 @@ unsigned long housecatInputButton::readTimeMs()
 
 void housecatInputButton::poll()
 {
-    switch (m_inputState)
+  if(m_firstPoll)
+  {
+    m_protocol.addInputButton(m_inputNumber);
+    m_firstPoll = false;
+  }
+
+  switch (m_inputState)
   {
     case rising_edge:
       m_shortPress = false;
@@ -53,6 +60,7 @@ void housecatInputButton::poll()
         if ((readTimeMs() - m_timerPrv) <= m_longPressTimeMs)
         {
           m_shortPress = true;
+          m_protocol.writeInputButtonShort(m_inputNumber, true);
           m_timerPrv = readTimeMs();
           m_inputState = falling_edge_holdoff;
         }
@@ -62,6 +70,7 @@ void housecatInputButton::poll()
         if ((readTimeMs() - m_timerPrv) > m_longPressTimeMs)
         {
           m_longPress = true;
+          m_protocol.writeInputButtonLong(m_inputNumber, true);
           m_inputState = long_press_wait;
         }
       }
@@ -78,6 +87,11 @@ void housecatInputButton::poll()
     case falling_edge_holdoff:
       if ((readTimeMs() - m_timerPrv) > m_holdOffTimeMs)
       {
+        if(m_shortPress)
+          m_protocol.writeInputButtonShort(m_inputNumber, false);
+        if(m_longPress)
+          m_protocol.writeInputButtonLong(m_inputNumber, false);
+
         m_inputState = rising_edge;
       }
       break;

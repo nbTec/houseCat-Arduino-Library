@@ -118,7 +118,7 @@ void housecatInputs::interruptCallback()
 
 bool housecatInputs::read(uint8_t input)
 {
-  if (input <= ((m_ioExpanderQuantity * m_ioExpanderPins) + 1))
+  if ((input > 0) && (input <= ((m_ioExpanderQuantity * m_ioExpanderPins) + 1)))
     return m_input[input - 1];
   else
     return false;

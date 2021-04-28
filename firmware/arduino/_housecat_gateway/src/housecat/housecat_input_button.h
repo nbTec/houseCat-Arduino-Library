@@ -3,11 +3,13 @@
 #define _HOUSECAT_INPUT_BUTTON_H_
 
 #include "housecat_inputs.h"
+#include "housecat_protocol.h"
 
 class housecatInputButton
 {
   private:
     housecatInputs &m_inputs;
+    housecatProtocol &m_protocol;
 
     static const uint16_t m_longPressTimeMs   = 1000;
     static const uint16_t m_holdOffTimeMs     = 50;
@@ -16,6 +18,7 @@ class housecatInputButton
     unsigned long m_timerPrv = 0;
     bool m_shortPress;
     bool m_longPress;
+    bool m_firstPoll = true;
 
     enum enum_inputState {rising_edge, rising_edge_holdoff, falling_edge, falling_edge_holdoff, long_press_wait};
     enum_inputState m_inputState = rising_edge;
@@ -23,7 +26,7 @@ class housecatInputButton
     unsigned long readTimeMs();
 
   public:
-    housecatInputButton(housecatInputs &inputs, uint8_t inputNumber);
+    housecatInputButton(housecatInputs &inputs, housecatProtocol &protocol, uint8_t inputNumber);
 
     void poll();
 
