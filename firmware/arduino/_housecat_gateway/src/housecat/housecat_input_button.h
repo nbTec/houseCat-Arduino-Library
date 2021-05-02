@@ -8,9 +8,9 @@
 class housecatInputButton
 {
   private:
-    housecatInputs &m_inputs;
     housecatProtocol &m_protocol;
-
+    housecatInputs &m_inputs;
+    
     static const uint16_t m_longPressTimeMs   = 1000;
     static const uint16_t m_holdOffTimeMs     = 50;
 
@@ -26,7 +26,7 @@ class housecatInputButton
     unsigned long readTimeMs();
 
   public:
-    housecatInputButton(housecatInputs &inputs, housecatProtocol &protocol, uint8_t inputNumber);
+    housecatInputButton(housecatProtocol &protocol, housecatInputs &inputs, uint8_t inputNumber);
 
     void poll();
 

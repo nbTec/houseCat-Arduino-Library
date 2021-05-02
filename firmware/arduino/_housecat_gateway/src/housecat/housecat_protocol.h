@@ -1,4 +1,3 @@
-
 #ifndef _HOUSECAT_PROTOCOL_H_
 #define _HOUSECAT_PROTOCOL_H_
 
@@ -7,20 +6,21 @@
 #include <WiFi.h>
 #include <MQTT.h>
 
+enum enumProtocolBlindsState {blind_stop = 0, blind_up = 1, blind_down = 2, blind_open = 3, blind_closed = 4};
 
 class housecatProtocol
 {
   private:
     bool m_modbusEnabled = false;
     bool m_mqttEnabled = false;
-    bool m_UDPEnabled = false;
+    bool m_udpEnabled = false;
+
+    bool m_connected = false;
 
     ModbusIP m_modbusTcp;
 
-
     WiFiClient m_wifiClient;
     MQTTClient m_mqttClient;
-
     IPAddress m_mqttBrokerIpAddress;
     int m_mqttBrokerPort;
     String m_mqttUsername, m_mqttPassword;
@@ -37,13 +37,14 @@ class housecatProtocol
     String m_mqttInputButtonShortSubTopic = "/short/";
     String m_mqttInputButtonLongSubTopic = "/long/";
     String m_mqttOutputsTopic = "/housecat/output/";
+    String m_mqttOutputBlindSubTopic = "/blind/";
     String m_mqttDimmerTopic = "/housecat/dimmer/";
     
     bool m_mqttInputsShort[65];
     bool m_mqttInputsLong[65];
     uint8_t m_mqttOutputs[65];
-    uint8_t m_mqttDimmerValues[65];
-    uint8_t m_mqttDimmerStates[65];
+    uint8_t m_mqttDimmerValues[9];
+    uint8_t m_mqttDimmerStates[9];
 
 
   public:
@@ -59,19 +60,30 @@ class housecatProtocol
     void enableUDP();
 
     void init();
-    void poll();
-
-    void addInputButton(uint8_t input);
+ 
+    bool addInputButton(uint8_t input);
     void writeInputButtonShort(uint8_t input, bool state);
     void writeInputButtonLong(uint8_t input, bool state);
 
-    void addOutput(uint8_t output);
+    bool addOutput(uint8_t output);
     bool readOutput(uint8_t output);
     void writeOutput(uint8_t output, bool state);
 
-    void addRegister(uint8_t output);
+    bool addBlind(uint8_t output);
+    enumProtocolBlindsState readBlind(uint8_t output);
+    void writeBlind(uint8_t output, enumProtocolBlindsState state);
+
+    /*bool addDimmer(uint8_t dimmer);
+    uint8_t readDimmerState(uint8_t dimmer);
+    void writeDimmerState(uint8_t dimmer, uint8_t state);
+    uint8_t readDimmerValue(uint8_t dimmer);
+    void writeDimmerValue(uint8_t dimmer, uint8_t value);*/
+
+    bool addRegister(uint8_t output);
     uint16_t readRegister(uint8_t output);
     void writeRegister(uint8_t output, uint16_t state);
+
+    void poll();
 };
 
 #endif

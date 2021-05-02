@@ -5,17 +5,17 @@
 
 
 //Input buttons
-housecatInputButton buttonHallway_1(inputs, protocol, 1);
-housecatInputButton buttonHallway_2(inputs, protocol, 54);
+housecatInputButton buttonHallway_1(protocol, inputs, 1);
+housecatInputButton buttonHallway_2(protocol, inputs, 54);
 
 //Output relays
-housecatOutputRelay lightHallway(outputs, protocol, 23);
+housecatOutputRelay lightHallway(protocol, outputs, 1);
 
 //Analog output dimmers
 housecatAnalogOutputDimmer dimmerLivingroom(analog_outputs, 1, 10, 70);
 
 //Blinds
-housecatOutputBlinds blindLivingRoom_1(outputs, 8, 61, 30);
+housecatOutputBlinds blindLivingRoom_1(protocol, outputs, 23, 24, 30);
 
 
 static bool eth_connected = false;
@@ -53,6 +53,9 @@ void setup()
   pinMode(INPUT_INT_PIN, INPUT);
   attachInterrupt(INPUT_INT_PIN, inputs_interrupt_callback, FALLING);
 
+  lightHallway.enableAutoOff(30);
+  lightHallway.enableMotion(10);
+
   //modbus_tcp.server();              // Act as Modbus TCP server
   //modbus_tcp.addReg(HREG(100));     // Add Holding register #100
   //modbus_tcp.addCoil(0);            // Add Coil #0
@@ -81,9 +84,9 @@ void inputPolling()
 
 void outputPolling()
 {
-  lightHallway.poll(buttonHallway_1.longPress() or buttonHallway_1.shortPress() or buttonHallway_2.shortPress());
+  lightHallway.poll(buttonHallway_1.shortPress() or buttonHallway_2.shortPress(), false, buttonHallway_1.longPress());
   dimmerLivingroom.poll(buttonHallway_1.shortPress(), buttonHallway_1.longPress());
-  //blindLivingRoom_1.poll(buttonHallway_1.shortPress(), buttonHallway_1.longPress());
+  blindLivingRoom_1.poll(buttonHallway_1.shortPress(), buttonHallway_1.longPress());
 }
 
 

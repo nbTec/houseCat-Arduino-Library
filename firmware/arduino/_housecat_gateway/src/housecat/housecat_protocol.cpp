@@ -25,12 +25,21 @@ void housecatProtocol::enableModbus()
 {
   m_modbusEnabled = true;
   m_mqttEnabled = false;
+  m_udpEnabled = false;
 }
 
 void housecatProtocol::enableMqtt()
 {
-  m_mqttEnabled = true;
   m_modbusEnabled = false;
+  m_mqttEnabled = true;
+  m_udpEnabled = false;
+}
+
+void housecatProtocol::enableUDP()
+{
+  m_mqttEnabled = false;
+  m_modbusEnabled = false;
+  m_udpEnabled = true;
 }
 
 void housecatProtocol::mqttSetBroker(IPAddress brokerIp, int brokerPort)
@@ -86,12 +95,14 @@ void housecatProtocol::mqttConnect()
   m_mqttClient.subscribe("/housecat/status");
   m_mqttClient.publish("/housecat/status", "Hello");
 
+  
   for(int i = 1; i < sizeof(m_mqttOutputs); i++)
   {
     String output_number = String(i);
     String mqtt_topic = m_mqttOutputsTopic + output_number;
     m_mqttClient.subscribe(mqtt_topic);
   }
+  
 }
 
 void housecatProtocol::mqttCallback(String &topic, String &payload)
@@ -101,13 +112,17 @@ void housecatProtocol::mqttCallback(String &topic, String &payload)
   m_mqttReceivedPayload = payload;
 }
 
-void housecatProtocol::addInputButton(uint8_t input)
+bool housecatProtocol::addInputButton(uint8_t input)
 {
+  bool ret = false;
+
   if(m_modbusEnabled)
   {
-    m_modbusTcp.addIsts(input);
-    m_modbusTcp.addIsts(input + 64);
+    ret = m_modbusTcp.addIsts(input);
+    ret &= m_modbusTcp.addIsts(input + 64);
   }
+
+  return ret;
 }
 
 void housecatProtocol::writeInputButtonShort(uint8_t input, bool state)
@@ -148,12 +163,23 @@ void housecatProtocol::writeInputButtonLong(uint8_t input, bool state)
   }
 }
 
-void housecatProtocol::addOutput(uint8_t output)
+bool housecatProtocol::addOutput(uint8_t output)
 {
   if(m_modbusEnabled)
   {
-    m_modbusTcp.addCoil(output);
+    return m_modbusTcp.addCoil(output);
   }
+
+  /*
+  if(m_mqttEnabled)
+  {
+    String output_number = String(output);
+    String mqtt_topic = m_mqttOutputsTopic + output_number;
+    return m_mqttClient.subscribe(mqtt_topic);
+  }
+  */
+
+  return false;
 }
 
 bool housecatProtocol::readOutput(uint8_t output)
@@ -187,6 +213,92 @@ void housecatProtocol::writeOutput(uint8_t output, bool state)
   }
 }
 
+bool housecatProtocol::addBlind(uint8_t output)
+{
+  if(m_modbusEnabled)
+  {
+    return m_modbusTcp.addCoil(output);
+    return m_modbusTcp.addCoil(output + 1);
+  }
+  return false;
+}
+
+enumProtocolBlindsState housecatProtocol::readBlind(uint8_t output)
+{
+  if(m_modbusEnabled)
+  {
+    if(m_modbusTcp.Coil(output))
+    {
+      return blind_down;
+    }
+    else
+    {
+      return blind_up;
+    }
+  }
+  if(m_mqttEnabled)
+  {
+    return static_cast<enumProtocolBlindsState>(m_mqttOutputs[output]);
+  }
+  return static_cast<enumProtocolBlindsState>(0);
+}
+
+void housecatProtocol::writeBlind(uint8_t output, enumProtocolBlindsState state)
+{
+  if (m_modbusEnabled)
+  {
+    switch(state)
+    {
+      case blind_stop:
+        m_modbusTcp.Coil(output, true);
+      break;
+      case blind_up:
+
+      break;
+      case blind_down:
+ 
+      break;
+      case blind_open:
+
+      break;
+      case blind_closed:
+
+      break;
+      default:
+      break;
+    }
+  }
+  
+  if(m_mqttEnabled)
+  {
+    m_mqttOutputs[output] = static_cast<uint8_t>(state);
+    String output_number = String(output);
+    String mqtt_topic = m_mqttOutputsTopic + output_number;
+    String blind_state;
+    switch(state)
+    {
+      case blind_stop:
+        blind_state = "STOP";
+      break;
+      case blind_up:
+        blind_state = "UP";
+      break;
+      case blind_down:
+        blind_state = "DOWN";
+      break;
+      case blind_open:
+        blind_state = "OPEN";
+      break;
+      case blind_closed:
+        blind_state = "CLOSED";
+      break;
+      default:
+      break;
+    }
+    m_mqttClient.publish(mqtt_topic, blind_state);
+  }
+}
+
 void housecatProtocol::poll()
 {
   if(m_modbusEnabled)
@@ -205,13 +317,11 @@ void housecatProtocol::poll()
   }
 
   if(m_mqttCallback)
-  {
-    /*
-    Serial.print("MQTT: ");
-    Serial.print(m_mqttReceivedTopic);
-    Serial.print(", ");
-    Serial.println(m_mqttReceivedPayload);
-    */
+  { 
+  Serial.print("MQTT: ");
+  Serial.print(m_mqttReceivedTopic);
+  Serial.print(", ");
+  Serial.println(m_mqttReceivedPayload);
 
   if(m_mqttReceivedTopic.startsWith(m_mqttOutputsTopic))
   {
@@ -226,6 +336,18 @@ void housecatProtocol::poll()
       else if(m_mqttReceivedPayload == "FALSE")
       {
         m_mqttOutputs[output_number] = false;
+      }
+      else if(m_mqttReceivedPayload == "STOP")
+      {
+        m_mqttOutputs[output_number] = blind_stop;
+      }
+      else if(m_mqttReceivedPayload == "UP")
+      {
+        m_mqttOutputs[output_number] = blind_up;
+      }
+      else if(m_mqttReceivedPayload == "DOWN")
+      {
+        m_mqttOutputs[output_number] = blind_down;
       }
     }
   }

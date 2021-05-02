@@ -13,8 +13,8 @@
 #include "WProgram.h"
 #endif
 
-housecatInputButton::housecatInputButton(housecatInputs &inputs, housecatProtocol &protocol, uint8_t inputNumber)
-: m_inputs(inputs), m_protocol(protocol), m_inputNumber(inputNumber)
+housecatInputButton::housecatInputButton(housecatProtocol &protocol, housecatInputs &inputs, uint8_t inputNumber)
+: m_protocol(protocol), m_inputs(inputs), m_inputNumber(inputNumber)
 {
 
 }
