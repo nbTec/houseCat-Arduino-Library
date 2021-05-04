@@ -49,8 +49,7 @@ void housecatOutputRelay::disableMotion()
 void housecatOutputRelay::poll(bool toggleInput)
 {
   uint8_t toggle_pressed = toggleInput && (!m_toggleInputPrv);
-  uint8_t protocol_state = m_protocol.readOutput(m_outputNumber);
-  
+    
   if (m_firstPoll)
   {
     m_outputState = m_outputs.read(m_outputNumber); //Update output state
@@ -67,6 +66,7 @@ void housecatOutputRelay::poll(bool toggleInput)
     m_autoOffStartTime = readTimeSec();
   }
 
+  uint8_t protocol_state = m_protocol.readOutput(m_outputNumber);
   if(protocol_state != m_outputState)
   {
     m_outputState = protocol_state;

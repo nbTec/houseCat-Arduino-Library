@@ -72,6 +72,11 @@ void housecatProtocol::init()
     m_mqttClient.onMessage(mqttCallback);
     mqttConnect();
   }
+
+  if(m_udpEnabled)
+  {
+    
+  }
 }
 
 void housecatProtocol::mqttConnect()
@@ -99,10 +104,18 @@ void housecatProtocol::mqttConnect()
   for(int i = 1; i < sizeof(m_mqttOutputs); i++)
   {
     String output_number = String(i);
-    String mqtt_topic = m_mqttOutputsTopic + output_number;
-    m_mqttClient.subscribe(mqtt_topic);
+    String mqtt_output_topic = m_mqttOutputsTopic + output_number;
+    m_mqttClient.subscribe(mqtt_output_topic);
   }
-  
+
+  for(int i = 1; i < sizeof(m_mqttDimmerStates); i++)
+  {
+    String dimmer_number = String(i);
+    String mqtt_dimmer_topic = m_mqttDimmersTopic + dimmer_number + m_mqttDimmersStateSubTopic;
+    m_mqttClient.subscribe(mqtt_dimmer_topic);
+    mqtt_dimmer_topic = m_mqttDimmersTopic + dimmer_number + m_mqttDimmersValueSubTopic;
+    m_mqttClient.subscribe(mqtt_dimmer_topic);
+  }
 }
 
 void housecatProtocol::mqttCallback(String &topic, String &payload)
@@ -142,6 +155,11 @@ void housecatProtocol::writeInputButtonShort(uint8_t input, bool state)
     String mqtt_topic = m_mqttInputsTopic + input_number + m_mqttInputButtonShortSubTopic;
     m_mqttClient.publish(mqtt_topic, state ? "TRUE" : "FALSE");
   }
+
+  if(m_udpEnabled)
+  {
+    
+  }
 }
 
 void housecatProtocol::writeInputButtonLong(uint8_t input, bool state)
@@ -160,6 +178,11 @@ void housecatProtocol::writeInputButtonLong(uint8_t input, bool state)
     String input_number = String(input);
     String mqtt_topic = m_mqttInputsTopic + input_number + m_mqttInputButtonLongSubTopic;
     m_mqttClient.publish(mqtt_topic, state ? "TRUE" : "FALSE");
+  }
+
+  if(m_udpEnabled)
+  {
+    
   }
 }
 
@@ -194,6 +217,11 @@ bool housecatProtocol::readOutput(uint8_t output)
     return m_mqttOutputs[output];
   }
 
+  if(m_udpEnabled)
+  {
+    
+  }
+
   return false;
 }
 
@@ -211,16 +239,24 @@ void housecatProtocol::writeOutput(uint8_t output, bool state)
     String mqtt_topic = m_mqttOutputsTopic + output_number;
     m_mqttClient.publish(mqtt_topic, state ? "TRUE" : "FALSE");
   }
+
+  if(m_udpEnabled)
+  {
+    
+  }
 }
 
 bool housecatProtocol::addBlind(uint8_t output)
 {
+  bool ret = false;
+  
   if(m_modbusEnabled)
   {
-    return m_modbusTcp.addCoil(output);
-    return m_modbusTcp.addCoil(output + 1);
+    ret = m_modbusTcp.addCoil(output);
+    ret &= m_modbusTcp.addCoil(output + 1);
   }
-  return false;
+
+  return ret;
 }
 
 enumProtocolBlindsState housecatProtocol::readBlind(uint8_t output)
@@ -236,10 +272,17 @@ enumProtocolBlindsState housecatProtocol::readBlind(uint8_t output)
       return blind_up;
     }
   }
+
   if(m_mqttEnabled)
   {
     return static_cast<enumProtocolBlindsState>(m_mqttOutputs[output]);
   }
+
+  if(m_udpEnabled)
+  {
+    
+  }
+
   return static_cast<enumProtocolBlindsState>(0);
 }
 
@@ -297,7 +340,89 @@ void housecatProtocol::writeBlind(uint8_t output, enumProtocolBlindsState state)
     }
     m_mqttClient.publish(mqtt_topic, blind_state);
   }
+
+  if(m_udpEnabled)
+  {
+    
+  }
 }
+
+bool housecatProtocol::addDimmer(uint8_t dimmer)
+{
+  bool ret = false;
+
+  if(m_modbusEnabled)
+  {
+    ret = m_modbusTcp.addCoil(dimmer);
+    ret &= m_modbusTcp.addHreg(dimmer);
+  }
+
+  return ret;
+}
+
+bool housecatProtocol::readDimmerState(uint8_t dimmer)
+{
+  if(m_modbusEnabled)
+  {
+    return (bool) (m_modbusTcp.Coil(dimmer) & 0x01);
+  }
+
+  if(m_mqttEnabled)
+  {
+    return m_mqttDimmerStates[dimmer];
+  }
+
+  return false;
+}
+
+void housecatProtocol::writeDimmerState(uint8_t dimmer, bool state)
+{
+  if(m_modbusEnabled)
+  {
+    m_modbusTcp.Coil(dimmer, state);
+  }
+
+  if(m_mqttEnabled)
+  {
+    m_mqttDimmerStates[dimmer] = state;
+    String dimmer_number = String(dimmer);
+    String mqtt_topic = m_mqttDimmersTopic + dimmer_number + m_mqttDimmersStateSubTopic;
+    m_mqttClient.publish(mqtt_topic, state ? "TRUE" : "FALSE");
+  }
+}
+
+uint8_t housecatProtocol::readDimmerValue(uint8_t dimmer)
+{
+  if(m_modbusEnabled)
+  {
+    return (bool) (m_modbusTcp.Hreg(dimmer) & 0xFF);
+  }
+
+  if(m_mqttEnabled)
+  {
+    return m_mqttDimmerValues[dimmer];
+  }
+
+  return 0;
+}
+
+void housecatProtocol::writeDimmerValue(uint8_t dimmer, uint8_t value)
+{
+  if(m_modbusEnabled)
+  {
+    m_modbusTcp.Hreg(dimmer, value);
+  }
+
+  if(m_mqttEnabled)
+  {
+    m_mqttDimmerValues[dimmer] = value;
+    String dimmer_number = String(dimmer);
+    String mqtt_topic = m_mqttDimmersTopic + dimmer_number + m_mqttDimmersValueSubTopic;
+    String mqtt_value = String(m_mqttDimmerValues[dimmer]);
+    m_mqttClient.publish(mqtt_topic, mqtt_value);
+  }
+}
+
 
 void housecatProtocol::poll()
 {
@@ -351,6 +476,44 @@ void housecatProtocol::poll()
       }
     }
   }
+  else if(m_mqttReceivedTopic.startsWith(m_mqttDimmersTopic))
+  {
+    String dimmer_substring = m_mqttReceivedTopic.substring(m_mqttDimmersTopic.length());
+    if(m_mqttReceivedTopic.endsWith(m_mqttDimmersStateSubTopic))
+    {
+      String dimmer_number_substring = dimmer_substring.substring(0, dimmer_substring.length() - m_mqttDimmersStateSubTopic.length());
+      int dimmer_number = dimmer_number_substring.toInt();
+      if((0 < dimmer_number) && (dimmer_number < sizeof(m_mqttDimmerStates)))
+      {
+        if(m_mqttReceivedPayload == "TRUE")
+        {
+          m_mqttDimmerStates[dimmer_number] = true;
+        }
+        else if(m_mqttReceivedPayload == "FALSE")
+        {
+          m_mqttDimmerStates[dimmer_number] = false;
+        }
+      }
+    }
+    else if(m_mqttReceivedTopic.endsWith(m_mqttDimmersValueSubTopic))
+    {
+      String dimmer_number_substring = dimmer_substring.substring(0, dimmer_substring.length() - m_mqttDimmersStateSubTopic.length());
+      int dimmer_number = dimmer_number_substring.toInt();
+      if((0 < dimmer_number) && (dimmer_number < sizeof(m_mqttDimmerStates)))
+      {
+        uint8_t dimmer_value = m_mqttReceivedPayload.toInt();
+        if((dimmer_value > 0) && (dimmer_value <= 100))
+        {
+          m_mqttDimmerValues[dimmer_number] = dimmer_value;
+        }
+      }
+    }
+  }
     m_mqttCallback = false;
+  }
+
+  if(m_udpEnabled)
+  {
+    
   }
 }

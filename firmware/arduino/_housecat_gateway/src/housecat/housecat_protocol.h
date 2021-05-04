@@ -37,14 +37,15 @@ class housecatProtocol
     String m_mqttInputButtonShortSubTopic = "/short/";
     String m_mqttInputButtonLongSubTopic = "/long/";
     String m_mqttOutputsTopic = "/housecat/output/";
-    String m_mqttOutputBlindSubTopic = "/blind/";
-    String m_mqttDimmerTopic = "/housecat/dimmer/";
+    String m_mqttDimmersTopic = "/housecat/dimmer/";
+    String m_mqttDimmersStateSubTopic = "/state/";
+    String m_mqttDimmersValueSubTopic = "/value/";
     
     bool m_mqttInputsShort[65];
-    bool m_mqttInputsLong[65];
+    bool m_mqttInputsLong[sizeof(m_mqttInputsShort)];
     uint8_t m_mqttOutputs[65];
-    uint8_t m_mqttDimmerValues[9];
     uint8_t m_mqttDimmerStates[9];
+    uint8_t m_mqttDimmerValues[sizeof(m_mqttDimmerStates)];
 
 
   public:
@@ -73,15 +74,11 @@ class housecatProtocol
     enumProtocolBlindsState readBlind(uint8_t output);
     void writeBlind(uint8_t output, enumProtocolBlindsState state);
 
-    /*bool addDimmer(uint8_t dimmer);
-    uint8_t readDimmerState(uint8_t dimmer);
-    void writeDimmerState(uint8_t dimmer, uint8_t state);
+    bool addDimmer(uint8_t dimmer);
+    bool readDimmerState(uint8_t dimmer);
+    void writeDimmerState(uint8_t dimmer, bool state);
     uint8_t readDimmerValue(uint8_t dimmer);
-    void writeDimmerValue(uint8_t dimmer, uint8_t value);*/
-
-    bool addRegister(uint8_t output);
-    uint16_t readRegister(uint8_t output);
-    void writeRegister(uint8_t output, uint16_t state);
+    void writeDimmerValue(uint8_t dimmer, uint8_t value);
 
     void poll();
 };

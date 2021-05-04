@@ -12,7 +12,7 @@ housecatInputButton buttonHallway_2(protocol, inputs, 54);
 housecatOutputRelay lightHallway(protocol, outputs, 1);
 
 //Analog output dimmers
-housecatAnalogOutputDimmer dimmerLivingroom(analog_outputs, 1, 10, 70);
+housecatAnalogOutputDimmer dimmerLivingroom(protocol, analog_outputs, 1, 10, 70);
 
 //Blinds
 housecatOutputBlinds blindLivingRoom_1(protocol, outputs, 23, 24, 30);
@@ -85,8 +85,8 @@ void inputPolling()
 void outputPolling()
 {
   lightHallway.poll(buttonHallway_1.shortPress() or buttonHallway_2.shortPress(), false, buttonHallway_1.longPress());
-  dimmerLivingroom.poll(buttonHallway_1.shortPress(), buttonHallway_1.longPress());
-  blindLivingRoom_1.poll(buttonHallway_1.shortPress(), buttonHallway_1.longPress());
+  //dimmerLivingroom.poll(buttonHallway_1.shortPress(), buttonHallway_1.longPress());
+  //blindLivingRoom_1.poll(buttonHallway_1.shortPress(), buttonHallway_1.longPress());
 }
 
 
