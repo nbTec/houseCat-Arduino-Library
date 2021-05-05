@@ -75,7 +75,8 @@ void housecatProtocol::init()
 
   if(m_udpEnabled)
   {
-    
+    m_udpSend.begin(m_udpSendPort);
+    m_udpReceive.begin(m_udpReceivePort);
   }
 }
 
@@ -123,6 +124,17 @@ void housecatProtocol::mqttCallback(String &topic, String &payload)
   m_mqttCallback = true;
   m_mqttReceivedTopic = topic;
   m_mqttReceivedPayload = payload;
+}
+
+void housecatProtocol::writeInput(uint8_t input, bool state)
+{
+  if(m_udpEnabled)
+  {
+    uint8_t buffer[50] = "Test";
+    m_udpSend.beginPacket(m_udpSendIpAddress, m_udpSendPort);
+    m_udpSend.write(buffer, 10);
+    m_udpSend.endPacket();
+  }
 }
 
 bool housecatProtocol::addInputButton(uint8_t input)
@@ -182,7 +194,7 @@ void housecatProtocol::writeInputButtonLong(uint8_t input, bool state)
 
   if(m_udpEnabled)
   {
-    
+
   }
 }
 
@@ -242,7 +254,7 @@ void housecatProtocol::writeOutput(uint8_t output, bool state)
 
   if(m_udpEnabled)
   {
-    
+
   }
 }
 

@@ -16,8 +16,8 @@
 
 housecatProtocol protocol;
 
-housecatInputs inputs;
-housecatOutputs outputs;
+housecatInputs inputs(protocol);
+housecatOutputs outputs(protocol);
 housecatAnalogOutputs analog_outputs;
 
 #endif

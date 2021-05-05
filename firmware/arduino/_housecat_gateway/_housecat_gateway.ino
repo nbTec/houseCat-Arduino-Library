@@ -40,8 +40,9 @@ void setup()
   ethernetInit();
 
   //protocol.enableModbus();
-  protocol.enableMqtt();
+  /*protocol.enableMqtt();
 
+  protocol.enableUDP();
   protocol.init();
   
   inputs.init();
@@ -89,8 +90,6 @@ void outputPolling()
   //blindLivingRoom_1.poll(buttonHallway_1.shortPress(), buttonHallway_1.longPress());
 }
 
-
-
 void heartbeatLed()
 {
   static unsigned long timer = 0;
@@ -112,25 +111,6 @@ void inputHandler()
     input_interrupt = false;
   }
 }
-
-/*
-void modbusHandler()
-{
-  static unsigned long timer = 0;
-  static bool coil = false;
-
-  modbus_tcp.task();
-  //outputs.write(8, modbus_tcp.Coil(0));  //Read coil and write to output
-
-
-  if ((millis() - timer) > 1000) //run every second;
-  {
-    timer = millis();
-    modbus_tcp.Coil(0, coil);
-    coil = !coil;
-  }
-}
-*/
 
 void scanI2c()
 {

@@ -5,6 +5,8 @@
 #include <Wire.h>
 #include "../Adafruit-MCP23017-Arduino-Library/Adafruit_MCP23017.h"
 
+#include "housecat_protocol.h"
+
 class housecatOutputs
 {
   private:
@@ -16,8 +18,10 @@ class housecatOutputs
     uint8_t m_mapping[m_ioExpanderQuantity][m_ioExpanderPins];
     bool m_output[m_ioExpanderQuantity * m_ioExpanderPins];
 
+    housecatProtocol &m_protocol;
+
   public:
-    housecatOutputs();
+    housecatOutputs(housecatProtocol &protocol);
     void init();
     bool read(uint8_t output);
     void write(uint8_t output, bool state);

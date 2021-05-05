@@ -19,6 +19,7 @@ class housecatProtocol
 
     ModbusIP m_modbusTcp;
 
+
     WiFiClient m_wifiClient;
     MQTTClient m_mqttClient;
     IPAddress m_mqttBrokerIpAddress;
@@ -48,6 +49,19 @@ class housecatProtocol
     uint8_t m_mqttDimmerValues[sizeof(m_mqttDimmerStates)];
 
 
+    WiFiUDP m_udpSend;
+    WiFiUDP m_udpReceive;
+    int m_udpSendPort = 44444;
+    int m_udpReceivePort = 55555;
+    IPAddress m_udpSendIpAddress = IPAddress(192, 168, 1, 101);
+
+    String m_udpDeviceName = "housecat";
+    int m_udpDeviceAddress = 1;
+    String m_udpDigitalInputPrefix = "din";
+    String m_udpDigitalOutoutPrefix = "dout";
+    String m_udpAnalogOutoutPrefix = "aout";
+
+
   public:
     housecatProtocol();
 
@@ -62,6 +76,8 @@ class housecatProtocol
 
     void init();
  
+    void writeInput(uint8_t input, bool state);
+
     bool addInputButton(uint8_t input);
     void writeInputButtonShort(uint8_t input, bool state);
     void writeInputButtonLong(uint8_t input, bool state);

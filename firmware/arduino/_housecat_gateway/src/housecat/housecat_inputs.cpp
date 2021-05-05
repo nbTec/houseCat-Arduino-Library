@@ -13,7 +13,7 @@
 #include "WProgram.h"
 #endif
 
-housecatInputs::housecatInputs()
+housecatInputs::housecatInputs(housecatProtocol &protocol): m_protocol(protocol)
 {
   m_mapping[0][0] = 7;
   m_mapping[0][1] = 39;
@@ -106,6 +106,9 @@ void housecatInputs::interruptCallback()
     {
       value = m_ioExpander[i].getLastInterruptPinValue();
       m_input[m_mapping[i][interrupt_pin]] = value;
+
+      m_protocol.writeInput(m_mapping[i][interrupt_pin], (bool) value);
+
       /*Serial.print("IO Expander: ");
       Serial.print(i);
       Serial.print(", Input: ");

@@ -5,6 +5,8 @@
 #include <Wire.h>
 #include "../Adafruit-MCP23017-Arduino-Library/Adafruit_MCP23017.h"
 
+#include "housecat_protocol.h"
+
 class housecatInputs
 {
   private:
@@ -15,10 +17,11 @@ class housecatInputs
     Adafruit_MCP23017 m_ioExpander[m_ioExpanderQuantity];
     uint8_t m_mapping[m_ioExpanderQuantity][m_ioExpanderPins];
     bool m_input[m_ioExpanderQuantity * m_ioExpanderPins];
-    
+
+    housecatProtocol &m_protocol;
 
   public:
-    housecatInputs();
+    housecatInputs(housecatProtocol &protocol);
     void init();
     void interruptCallback();
     bool read(uint8_t input);

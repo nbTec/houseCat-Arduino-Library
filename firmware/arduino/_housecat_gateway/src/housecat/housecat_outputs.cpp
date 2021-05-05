@@ -13,7 +13,7 @@
 #include "WProgram.h"
 #endif
 
-housecatOutputs::housecatOutputs()
+housecatOutputs::housecatOutputs(housecatProtocol &protocol): m_protocol(protocol)
 {
   m_mapping[0][0] = 0;
   m_mapping[0][1] = 1;
