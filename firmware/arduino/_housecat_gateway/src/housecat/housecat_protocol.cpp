@@ -21,26 +21,48 @@ housecatProtocol::housecatProtocol()
 {
 }
 
-void housecatProtocol::enableModbus()
+void housecatProtocol::modbusEnable()
 {
   m_modbusEnabled = true;
   m_mqttEnabled = false;
   m_udpEnabled = false;
 }
 
-void housecatProtocol::enableMqtt()
+void housecatProtocol::mqttEnable()
 {
   m_modbusEnabled = false;
   m_mqttEnabled = true;
   m_udpEnabled = false;
 }
 
-void housecatProtocol::enableUDP()
+void housecatProtocol::udpEnable()
 {
   m_mqttEnabled = false;
   m_modbusEnabled = false;
   m_udpEnabled = true;
 }
+
+bool housecatProtocol::udpEnabled()
+{
+  return m_udpEnabled;
+}
+
+void housecatProtocol::udpSetAddress(int address)
+{
+  m_udpDeviceAddress = address;
+}
+
+void housecatProtocol::udpSetReceiver(int receivePort)
+{
+  m_udpReceivePort = receivePort;
+}
+
+void housecatProtocol::udpSetSender(IPAddress sendIp, int sendPort)
+{
+  m_udpSendIpAddress = sendIp;
+  m_udpSendPort = sendPort;
+}
+
 
 void housecatProtocol::mqttSetBroker(IPAddress brokerIp, int brokerPort)
 {
@@ -75,6 +97,10 @@ void housecatProtocol::init()
 
   if(m_udpEnabled)
   {
+    m_udpDigitalInputString =  m_udpDeviceName + String(m_udpDeviceAddress) + m_udpSeparator + m_udpDigitalInputPrefix;
+    m_udpDigitalOutputString =  m_udpDeviceName + String(m_udpDeviceAddress) + m_udpSeparator + m_udpDigitalOutputPrefix;
+    m_udpAnalogOutputString =  m_udpDeviceName + String(m_udpDeviceAddress) + m_udpSeparator + m_udpAnalogOutoutPrefix;
+
     m_udpSend.begin(m_udpSendPort);
     m_udpReceive.begin(m_udpReceivePort);
   }
@@ -126,16 +152,42 @@ void housecatProtocol::mqttCallback(String &topic, String &payload)
   m_mqttReceivedPayload = payload;
 }
 
-void housecatProtocol::writeInput(uint8_t input, bool state)
+
+void housecatProtocol::writeInputRaw(uint8_t input, bool state)
 {
   if(m_udpEnabled)
   {
-    uint8_t buffer[50] = "Test";
+    String udp_string = m_udpDigitalInputString + String(input) + m_udpSeparator + String(state);
+    int string_length = udp_string.length() + 1;
+    uint8_t buffer[string_length];
+    udp_string.toCharArray((char*) buffer, string_length);
+
     m_udpSend.beginPacket(m_udpSendIpAddress, m_udpSendPort);
-    m_udpSend.write(buffer, 10);
+    m_udpSend.write(buffer, string_length);
     m_udpSend.endPacket();
   }
 }
+
+bool housecatProtocol::readOutputRaw(uint8_t output)
+{
+  if(m_udpEnabled)
+  {
+    return m_udpOutputs[output];
+  }
+
+  return false;
+}
+
+int housecatProtocol::readAnalogOutputRaw(uint8_t output)
+{
+  if(m_udpEnabled)
+  {
+    return m_udpAnalogOutputs[output];
+  }
+
+  return 0;
+}
+
 
 bool housecatProtocol::addInputButton(uint8_t input)
 {
@@ -167,11 +219,6 @@ void housecatProtocol::writeInputButtonShort(uint8_t input, bool state)
     String mqtt_topic = m_mqttInputsTopic + input_number + m_mqttInputButtonShortSubTopic;
     m_mqttClient.publish(mqtt_topic, state ? "TRUE" : "FALSE");
   }
-
-  if(m_udpEnabled)
-  {
-    
-  }
 }
 
 void housecatProtocol::writeInputButtonLong(uint8_t input, bool state)
@@ -190,11 +237,6 @@ void housecatProtocol::writeInputButtonLong(uint8_t input, bool state)
     String input_number = String(input);
     String mqtt_topic = m_mqttInputsTopic + input_number + m_mqttInputButtonLongSubTopic;
     m_mqttClient.publish(mqtt_topic, state ? "TRUE" : "FALSE");
-  }
-
-  if(m_udpEnabled)
-  {
-
   }
 }
 
@@ -229,11 +271,6 @@ bool housecatProtocol::readOutput(uint8_t output)
     return m_mqttOutputs[output];
   }
 
-  if(m_udpEnabled)
-  {
-    
-  }
-
   return false;
 }
 
@@ -250,11 +287,6 @@ void housecatProtocol::writeOutput(uint8_t output, bool state)
     String output_number = String(output);
     String mqtt_topic = m_mqttOutputsTopic + output_number;
     m_mqttClient.publish(mqtt_topic, state ? "TRUE" : "FALSE");
-  }
-
-  if(m_udpEnabled)
-  {
-
   }
 }
 
@@ -288,11 +320,6 @@ enumProtocolBlindsState housecatProtocol::readBlind(uint8_t output)
   if(m_mqttEnabled)
   {
     return static_cast<enumProtocolBlindsState>(m_mqttOutputs[output]);
-  }
-
-  if(m_udpEnabled)
-  {
-    
   }
 
   return static_cast<enumProtocolBlindsState>(0);
@@ -351,11 +378,6 @@ void housecatProtocol::writeBlind(uint8_t output, enumProtocolBlindsState state)
       break;
     }
     m_mqttClient.publish(mqtt_topic, blind_state);
-  }
-
-  if(m_udpEnabled)
-  {
-    
   }
 }
 
@@ -526,6 +548,51 @@ void housecatProtocol::poll()
 
   if(m_udpEnabled)
   {
-    
+    uint8_t udp_buffer[50];
+    String udp_string;
+    memset(udp_buffer, 0, 50);
+    m_udpReceive.parsePacket();
+
+    if(m_udpReceive.read(udp_buffer, 50) > 0)
+    {
+      udp_string = (char*) udp_buffer;
+
+      if(udp_string.startsWith(m_udpDigitalOutputString))
+      {
+        uint8_t string_seperator_index = udp_string.indexOf(m_udpSeparator, m_udpDigitalOutputString.length());
+        String output_index_string = udp_string.substring(m_udpDigitalOutputString.length(), string_seperator_index);
+        String output_state_string = udp_string.substring(string_seperator_index + 1);
+
+        uint8_t output_index = output_index_string.toInt();
+        uint8_t output_state = output_state_string.toInt();
+
+        if((output_index < sizeof(m_udpOutputs)) && (output_state <= 1))
+        {
+          m_udpOutputs[output_index] = output_state;
+          /*Serial.print("UDP: Digital output: ");
+          Serial.print(output_index);
+          Serial.print(" State: ");
+          Serial.println(output_state);*/
+        }
+      }
+      else if(udp_string.startsWith(m_udpAnalogOutputString))
+      {
+        uint8_t string_seperator_index = udp_string.indexOf(m_udpSeparator, m_udpAnalogOutputString.length());
+        String output_index_string = udp_string.substring(m_udpAnalogOutputString.length(), string_seperator_index);
+        String output_state_string = udp_string.substring(string_seperator_index + 1);
+
+        uint8_t output_index = output_index_string.toInt();
+        uint8_t output_state = output_state_string.toInt();
+
+        if(output_index < sizeof(m_udpAnalogOutputs))
+        {
+          m_udpAnalogOutputs[output_index] = output_state;
+          /*Serial.print("UDP: Analog output: ");
+          Serial.print(output_index);
+          Serial.print(" State: ");
+          Serial.println(output_state);*/
+        }
+      }
+    }
   }
 }

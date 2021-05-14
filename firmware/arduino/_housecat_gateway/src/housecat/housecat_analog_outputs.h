@@ -5,6 +5,8 @@
 #include <Wire.h>
 #include "../DAC7678/DAC7678.h"
 
+#include "housecat_protocol.h"
+
 class housecatAnalogOutputs
 {
   private:
@@ -19,12 +21,15 @@ class housecatAnalogOutputs
     uint8_t m_mapping[m_dacOutputs];
     float m_output[m_dacOutputs];
 
+    housecatProtocol &m_protocol;
+
   public:
-    housecatAnalogOutputs();
+    housecatAnalogOutputs(housecatProtocol &protocol);
     void init();
     float readFullScale();
     float read(uint8_t output);
     void write(uint8_t output, float value);
+    void poll();
 };
 
 #endif

@@ -26,6 +26,7 @@ class housecatOutputs
     bool read(uint8_t output);
     void write(uint8_t output, bool state);
     void toggle(uint8_t output, bool toggle);
+    void poll();
 };
 
 #endif

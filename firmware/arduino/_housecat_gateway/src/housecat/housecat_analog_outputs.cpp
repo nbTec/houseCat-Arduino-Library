@@ -13,7 +13,7 @@
 #include "WProgram.h"
 #endif
 
-housecatAnalogOutputs::housecatAnalogOutputs()
+housecatAnalogOutputs::housecatAnalogOutputs(housecatProtocol &protocol): m_protocol(protocol)
 {
   m_mapping[0] = 2;
   m_mapping[1] = 0;
@@ -37,7 +37,10 @@ float housecatAnalogOutputs::readFullScale()
 
 float housecatAnalogOutputs::read(uint8_t output)
 {
-  return m_output[output - 1];
+  if((output > 0) && (output <= m_dacOutputs))
+    return m_output[output - 1];
+  else
+    return 0;
 }
 
 void housecatAnalogOutputs::write(uint8_t output, float value)
@@ -54,3 +57,19 @@ void housecatAnalogOutputs::write(uint8_t output, float value)
  }
 }
 
+void housecatAnalogOutputs::poll()
+{
+  if(m_protocol.udpEnabled())
+  {
+    for(uint8_t i = 1; i <= m_dacOutputs; i++)
+    {
+      uint8_t output_raw_state = m_protocol.readAnalogOutputRaw(i);
+      float output_raw_voltage = ((float) output_raw_state / 25.5); //255 -> 10V
+
+      if(read(i) != output_raw_voltage)
+      {
+        write(i, output_raw_voltage);
+      }
+    }
+  }
+}

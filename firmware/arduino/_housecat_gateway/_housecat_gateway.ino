@@ -39,17 +39,13 @@ void setup()
   delay(50);
   ethernetInit();
 
-  //protocol.enableModbus();
-  /*protocol.enableMqtt();
 
-  protocol.enableUDP();
+
   protocol.init();
-  
+
   inputs.init();
   outputs.init();
   analog_outputs.init();
-
-  outputs.write(51, true);
 
   pinMode(INPUT_INT_PIN, INPUT);
   attachInterrupt(INPUT_INT_PIN, inputs_interrupt_callback, FALLING);
@@ -66,9 +62,10 @@ void setup()
 void loop()
 {
   protocol.poll();
-  
+  outputs.poll();
+  analog_outputs.poll();
+
   inputHandler();
-  //modbusHandler();
   heartbeatLed();
 
   inputPolling();
@@ -85,7 +82,7 @@ void inputPolling()
 
 void outputPolling()
 {
-  lightHallway.poll(buttonHallway_1.shortPress() or buttonHallway_2.shortPress(), false, buttonHallway_1.longPress());
+  //;lightHallway.poll(buttonHallway_1.shortPress() or buttonHallway_2.shortPress(), false, buttonHallway_1.longPress());
   //dimmerLivingroom.poll(buttonHallway_1.shortPress(), buttonHallway_1.longPress());
   //blindLivingRoom_1.poll(buttonHallway_1.shortPress(), buttonHallway_1.longPress());
 }

@@ -52,31 +52,43 @@ class housecatProtocol
     WiFiUDP m_udpSend;
     WiFiUDP m_udpReceive;
     int m_udpSendPort = 44444;
-    int m_udpReceivePort = 55555;
     IPAddress m_udpSendIpAddress = IPAddress(192, 168, 1, 101);
+    int m_udpReceivePort = 55555;
 
     String m_udpDeviceName = "housecat";
     int m_udpDeviceAddress = 1;
+    String m_udpSeparator = " ";
     String m_udpDigitalInputPrefix = "din";
-    String m_udpDigitalOutoutPrefix = "dout";
+    String m_udpDigitalOutputPrefix = "dout";
     String m_udpAnalogOutoutPrefix = "aout";
+    String m_udpDigitalInputString;
+    String m_udpDigitalOutputString;
+    String m_udpAnalogOutputString;
+    bool m_udpOutputs[65];
+    uint8_t m_udpAnalogOutputs[9];
 
 
   public:
     housecatProtocol();
 
-    void enableModbus();
+    void modbusEnable();
 
-    void enableMqtt();
+    void mqttEnable();
     void mqttSetBroker(IPAddress brokerIp, int brokerPort);
     void mqttSetBrokerCredentials(String username);
     void mqttSetBrokerCredentials(String username, String password);
 
-    void enableUDP();
+    void udpEnable();
+    bool udpEnabled();
+    void udpSetAddress(int address);
+    void udpSetReceiver(int receivePort);
+    void udpSetSender(IPAddress sendIp, int sendPort);
 
     void init();
  
-    void writeInput(uint8_t input, bool state);
+    void writeInputRaw(uint8_t input, bool state);
+    bool readOutputRaw(uint8_t output);
+    int readAnalogOutputRaw(uint8_t output);
 
     bool addInputButton(uint8_t input);
     void writeInputButtonShort(uint8_t input, bool state);

@@ -139,3 +139,19 @@ void housecatOutputs::toggle(uint8_t output, bool toggle)
     }
   }
 }
+
+void housecatOutputs::poll()
+{
+  if(m_protocol.udpEnabled())
+  {
+    for(uint8_t i = 1; i <= sizeof(m_output); i++)
+    {
+      uint8_t output_raw_state = m_protocol.readOutputRaw(i);
+
+      if(read(i) != output_raw_state)
+      {
+        write(i, output_raw_state);
+      }
+    }
+  }
+}
