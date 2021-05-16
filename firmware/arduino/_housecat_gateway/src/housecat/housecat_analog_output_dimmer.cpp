@@ -13,8 +13,8 @@
 #include "WProgram.h"
 #endif
 
-housecatAnalogOutputDimmer::housecatAnalogOutputDimmer(housecatProtocol &protocol, housecatAnalogOutputs &analogOutputs, uint8_t outputNumber, uint8_t startValue, uint8_t currentValue)
-: m_protocol(protocol), m_analogOutputs(analogOutputs), m_outputNumber(outputNumber), m_startValue(startValue), m_outputValue(currentValue)
+housecatAnalogOutputDimmer::housecatAnalogOutputDimmer(housecatProtocol &protocol, housecatAnalogOutputs &analogOutputs, uint8_t outputNumber, uint8_t startValue, uint8_t defaultValue)
+: m_protocol(protocol), m_analogOutputs(analogOutputs), m_outputNumber(outputNumber), m_startValue(startValue), m_outputValue(defaultValue)
 {
 }
 
@@ -47,7 +47,6 @@ void housecatAnalogOutputDimmer::poll(bool toggleInput, bool cycleInput)
     {
         m_analogOutputs.write(m_outputNumber, 0.0);
     }
-
     m_protocol.writeDimmerState(m_outputNumber, m_outputState);
   }
 

@@ -22,8 +22,8 @@ class housecatProtocol
 
     WiFiClient m_wifiClient;
     MQTTClient m_mqttClient;
-    IPAddress m_mqttBrokerIpAddress;
-    int m_mqttBrokerPort;
+    IPAddress m_mqttBrokerIpAddress = IPAddress(192, 168, 0, 1);
+    int m_mqttBrokerPort = 1883;
     String m_mqttUsername, m_mqttPassword;
 
     void mqttConnect();
@@ -37,22 +37,27 @@ class housecatProtocol
     String m_mqttInputsTopic = "/housecat/input/";
     String m_mqttInputButtonShortSubTopic = "/short/";
     String m_mqttInputButtonLongSubTopic = "/long/";
+    String m_mqttInputSensorSubTopic = "/sensor/";
     String m_mqttOutputsTopic = "/housecat/output/";
     String m_mqttDimmersTopic = "/housecat/dimmer/";
     String m_mqttDimmersStateSubTopic = "/state/";
     String m_mqttDimmersValueSubTopic = "/value/";
+
+    static const uint8_t m_digital_inputs = 64;
+    static const uint8_t m_digital_outputs = 64;
+    static const uint8_t m_analog_outputs = 8;
     
-    bool m_mqttInputsShort[65];
+    bool m_mqttInputsShort[m_digital_inputs + 1];
     bool m_mqttInputsLong[sizeof(m_mqttInputsShort)];
-    uint8_t m_mqttOutputs[65];
-    uint8_t m_mqttDimmerStates[9];
+    uint8_t m_mqttOutputs[m_digital_outputs + 1];
+    uint8_t m_mqttDimmerStates[m_analog_outputs + 1];
     uint8_t m_mqttDimmerValues[sizeof(m_mqttDimmerStates)];
 
 
     WiFiUDP m_udpSend;
     WiFiUDP m_udpReceive;
     int m_udpSendPort = 44444;
-    IPAddress m_udpSendIpAddress = IPAddress(192, 168, 1, 101);
+    IPAddress m_udpSendIpAddress = IPAddress(192, 168, 0, 1);
     int m_udpReceivePort = 55555;
 
     String m_udpDeviceName = "housecat";
@@ -64,8 +69,8 @@ class housecatProtocol
     String m_udpDigitalInputString;
     String m_udpDigitalOutputString;
     String m_udpAnalogOutputString;
-    bool m_udpOutputs[65];
-    uint8_t m_udpAnalogOutputs[9];
+    bool m_udpOutputs[m_digital_outputs + 1];
+    uint8_t m_udpAnalogOutputs[m_analog_outputs + 1];
 
 
   public:
@@ -93,6 +98,9 @@ class housecatProtocol
     bool addInputButton(uint8_t input);
     void writeInputButtonShort(uint8_t input, bool state);
     void writeInputButtonLong(uint8_t input, bool state);
+
+    bool addInputSensor(uint8_t input);
+    void writeInputSensor(uint8_t input, bool state);
 
     bool addOutput(uint8_t output);
     bool readOutput(uint8_t output);

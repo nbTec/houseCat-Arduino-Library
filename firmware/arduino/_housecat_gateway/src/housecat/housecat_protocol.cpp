@@ -240,6 +240,37 @@ void housecatProtocol::writeInputButtonLong(uint8_t input, bool state)
   }
 }
 
+bool housecatProtocol::addInputSensor(uint8_t input)
+{
+  bool ret = false;
+
+  if(m_modbusEnabled)
+  {
+    ret = m_modbusTcp.addIsts(input);
+  }
+
+  return ret;
+}
+
+void housecatProtocol::writeInputSensor(uint8_t input, bool state)
+{
+  if(m_modbusEnabled)
+  {
+    if(state)
+      m_modbusTcp.Ists(input, 1);
+    else
+      m_modbusTcp.Ists(input, 0);
+  }
+
+  if(m_mqttEnabled)
+  {
+    m_mqttInputsShort[input] = state;
+    String input_number = String(input);
+    String mqtt_topic = m_mqttInputsTopic + input_number + m_mqttInputSensorSubTopic;
+    m_mqttClient.publish(mqtt_topic, state ? "TRUE" : "FALSE");
+  }
+}
+
 bool housecatProtocol::addOutput(uint8_t output)
 {
   if(m_modbusEnabled)
@@ -387,7 +418,7 @@ bool housecatProtocol::addDimmer(uint8_t dimmer)
 
   if(m_modbusEnabled)
   {
-    ret = m_modbusTcp.addCoil(dimmer);
+    ret = m_modbusTcp.addCoil(m_digital_outputs + 1 + dimmer);
     ret &= m_modbusTcp.addHreg(dimmer);
   }
 
@@ -398,7 +429,7 @@ bool housecatProtocol::readDimmerState(uint8_t dimmer)
 {
   if(m_modbusEnabled)
   {
-    return (bool) (m_modbusTcp.Coil(dimmer) & 0x01);
+    return (bool) (m_modbusTcp.Coil(m_digital_outputs + 1 + dimmer) & 0x01);
   }
 
   if(m_mqttEnabled)
@@ -413,7 +444,7 @@ void housecatProtocol::writeDimmerState(uint8_t dimmer, bool state)
 {
   if(m_modbusEnabled)
   {
-    m_modbusTcp.Coil(dimmer, state);
+    m_modbusTcp.Coil(m_digital_outputs + 1 + dimmer, state);
   }
 
   if(m_mqttEnabled)
@@ -429,7 +460,7 @@ uint8_t housecatProtocol::readDimmerValue(uint8_t dimmer)
 {
   if(m_modbusEnabled)
   {
-    return (bool) (m_modbusTcp.Hreg(dimmer) & 0xFF);
+    return (m_modbusTcp.Hreg(dimmer) & 0xFF);
   }
 
   if(m_mqttEnabled)

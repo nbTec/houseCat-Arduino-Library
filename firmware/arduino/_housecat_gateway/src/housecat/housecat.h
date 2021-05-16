@@ -6,6 +6,7 @@
 
 #include "housecat_inputs.h"
 #include "housecat_input_button.h"
+#include "housecat_input_sensor.h"
 
 #include "housecat_outputs.h"
 #include "housecat_output_relay.h"

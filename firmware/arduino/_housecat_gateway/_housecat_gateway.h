@@ -1,16 +1,21 @@
 
 #define LED_PIN         33
-
 #define I2C_SCL_PIN     4
 #define I2C_SDA_PIN     16
-
 #define INPUT_INT_PIN   35
-
 #define ETH_ENABLE_PIN  13
 //#define ETH_POWER_PIN   13
 
 static bool eth_connected = false;
 static bool input_interrupt = false;
+
+void housecatInit(void)
+{
+  pinMode(LED_PIN, OUTPUT);
+  Serial.begin(115200);
+  Wire.begin(I2C_SDA_PIN, I2C_SCL_PIN, 400000);
+  delay(50);
+}
 
 void IRAM_ATTR inputs_interrupt_callback()
 {

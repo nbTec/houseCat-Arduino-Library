@@ -28,7 +28,7 @@ class housecatAnalogOutputDimmer
     unsigned long readTimeMs();
 
   public:
-    housecatAnalogOutputDimmer(housecatProtocol &protocol, housecatAnalogOutputs &analogOutputs, uint8_t outputNumber, uint8_t startValue, uint8_t currentValue);
+    housecatAnalogOutputDimmer(housecatProtocol &protocol, housecatAnalogOutputs &analogOutputs, uint8_t outputNumber, uint8_t startValue, uint8_t defaultValue);
 
     void poll(bool toggleInput, bool cycleInput);
 };
