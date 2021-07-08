@@ -1,5 +1,5 @@
 /*!
- * @file Adafruit_MCP23017.cpp
+ * @file housecat_device_mcp23017.cpp
  *
  * @mainpage Adafruit MCP23017 Library
  *
@@ -27,7 +27,7 @@
 #elif defined(ESP8266)
 #include <pgmspace.h>
 #endif
-#include "Adafruit_MCP23017.h"
+#include "housecat_device_mcp23017.h"
 
 #if ARDUINO >= 100
 #include "Arduino.h"
@@ -55,12 +55,12 @@ static inline uint8_t wirerecv(TwoWire *theWire) {
 /**
  * Bit number associated to a give Pin
  */
-uint8_t Adafruit_MCP23017::bitForPin(uint8_t pin) { return pin % 8; }
+uint8_t housecatDeviceMcp23017::bitForPin(uint8_t pin) { return pin % 8; }
 
 /**
  * Register address, port dependent, for a given PIN
  */
-uint8_t Adafruit_MCP23017::regForPin(uint8_t pin, uint8_t portAaddr,
+uint8_t housecatDeviceMcp23017::regForPin(uint8_t pin, uint8_t portAaddr,
                                      uint8_t portBaddr) {
   return (pin < 8) ? portAaddr : portBaddr;
 }
@@ -68,7 +68,7 @@ uint8_t Adafruit_MCP23017::regForPin(uint8_t pin, uint8_t portAaddr,
 /**
  * Reads a given register
  */
-uint8_t Adafruit_MCP23017::readRegister(uint8_t addr) {
+uint8_t housecatDeviceMcp23017::readRegister(uint8_t addr) {
   // read the current GPINTEN
   _wire->beginTransmission(MCP23017_ADDRESS | i2caddr);
   wiresend(addr, _wire);
@@ -80,7 +80,7 @@ uint8_t Adafruit_MCP23017::readRegister(uint8_t addr) {
 /**
  * Writes a given register
  */
-void Adafruit_MCP23017::writeRegister(uint8_t regAddr, uint8_t regValue) {
+void housecatDeviceMcp23017::writeRegister(uint8_t regAddr, uint8_t regValue) {
   // Write the register
   _wire->beginTransmission(MCP23017_ADDRESS | i2caddr);
   wiresend(regAddr, _wire);
@@ -93,7 +93,7 @@ void Adafruit_MCP23017::writeRegister(uint8_t regAddr, uint8_t regValue) {
  * - Reads the current register value
  * - Writes the new register value
  */
-void Adafruit_MCP23017::updateRegisterBit(uint8_t pin, uint8_t pValue,
+void housecatDeviceMcp23017::updateRegisterBit(uint8_t pin, uint8_t pValue,
                                           uint8_t portAaddr,
                                           uint8_t portBaddr) {
   uint8_t regValue;
@@ -115,7 +115,7 @@ void Adafruit_MCP23017::updateRegisterBit(uint8_t pin, uint8_t pValue,
  * @param addr Selected address
  * @param theWire the I2C object to use, defaults to &Wire
  */
-void Adafruit_MCP23017::begin(uint8_t addr, TwoWire *theWire) {
+void housecatDeviceMcp23017::begin(uint8_t addr, TwoWire *theWire) {
   if (addr > 7) {
     addr = 7;
   }
@@ -143,14 +143,14 @@ void Adafruit_MCP23017::begin(uint8_t addr, TwoWire *theWire) {
  * address
  * @param theWire the I2C object to use, defaults to &Wire
  */
-void Adafruit_MCP23017::begin(TwoWire *theWire) { begin(0, theWire); }
+void housecatDeviceMcp23017::begin(TwoWire *theWire) { begin(0, theWire); }
 
 /**
  * Sets the pin mode to either INPUT or OUTPUT
  * @param p Pin to set
  * @param d Mode to set the pin
  */
-void Adafruit_MCP23017::pinMode(uint8_t p, uint8_t d) {
+void housecatDeviceMcp23017::pinMode(uint8_t p, uint8_t d) {
   updateRegisterBit(p, (d == INPUT), MCP23017_IODIRA, MCP23017_IODIRB);
 }
 
@@ -158,7 +158,7 @@ void Adafruit_MCP23017::pinMode(uint8_t p, uint8_t d) {
  * Reads all 16 pins (port A and B) into a single 16 bits variable.
  * @return Returns the 16 bit variable representing all 16 pins
  */
-uint16_t Adafruit_MCP23017::readGPIOAB() {
+uint16_t housecatDeviceMcp23017::readGPIOAB() {
   uint16_t ba = 0;
   uint8_t a;
 
@@ -181,7 +181,7 @@ uint16_t Adafruit_MCP23017::readGPIOAB() {
  * @param b Decides what gpio to use. Should be 0 for GPIOA, and 1 for GPIOB.
  * @return Returns the b bit value of the port
  */
-uint8_t Adafruit_MCP23017::readGPIO(uint8_t b) {
+uint8_t housecatDeviceMcp23017::readGPIO(uint8_t b) {
 
   // read the current GPIO output latches
   _wire->beginTransmission(MCP23017_ADDRESS | i2caddr);
@@ -201,7 +201,7 @@ uint8_t Adafruit_MCP23017::readGPIO(uint8_t b) {
  * variable.
  * @return Returns the 16 bit variable representing all 16 pins outputs
  */
-uint16_t Adafruit_MCP23017::readOLATAB() {
+uint16_t housecatDeviceMcp23017::readOLATAB() {
   uint16_t ba = 0;
   uint8_t a;
 
@@ -225,7 +225,7 @@ uint16_t Adafruit_MCP23017::readOLATAB() {
  * @param b Decides what gpio to use. Should be 0 for GPIOA, and 1 for GPIOB.
  * @return Returns the b bit value of the output state of the port
  */
-uint8_t Adafruit_MCP23017::readOLAT(uint8_t b) {
+uint8_t housecatDeviceMcp23017::readOLAT(uint8_t b) {
 
   // read the current OLAT output latches
   _wire->beginTransmission(MCP23017_ADDRESS | i2caddr);
@@ -244,7 +244,7 @@ uint8_t Adafruit_MCP23017::readOLAT(uint8_t b) {
  * Writes all the pins in one go. This method is very useful if you are
  * implementing a multiplexed matrix and want to get a decent refresh rate.
  */
-void Adafruit_MCP23017::writeGPIOAB(uint16_t ba) {
+void housecatDeviceMcp23017::writeGPIOAB(uint16_t ba) {
   _wire->beginTransmission(MCP23017_ADDRESS | i2caddr);
   wiresend(MCP23017_GPIOA, _wire);
   wiresend(ba & 0xFF, _wire);
@@ -257,7 +257,7 @@ void Adafruit_MCP23017::writeGPIOAB(uint16_t ba) {
  * @param pin Pin to write to
  * @param d What to write to the pin
  */
-void Adafruit_MCP23017::digitalWrite(uint8_t pin, uint8_t d) {
+void housecatDeviceMcp23017::digitalWrite(uint8_t pin, uint8_t d) {
   uint8_t gpio;
   uint8_t bit = bitForPin(pin);
 
@@ -278,7 +278,7 @@ void Adafruit_MCP23017::digitalWrite(uint8_t pin, uint8_t d) {
  * @param p Pin to set
  * @param d Value to set the pin
  */
-void Adafruit_MCP23017::pullUp(uint8_t p, uint8_t d) {
+void housecatDeviceMcp23017::pullUp(uint8_t p, uint8_t d) {
   updateRegisterBit(p, d, MCP23017_GPPUA, MCP23017_GPPUB);
 }
 
@@ -287,7 +287,7 @@ void Adafruit_MCP23017::pullUp(uint8_t p, uint8_t d) {
  * @param pin Pin to read
  * @return Value of the pin
  */
-uint8_t Adafruit_MCP23017::digitalRead(uint8_t pin) {
+uint8_t housecatDeviceMcp23017::digitalRead(uint8_t pin) {
   uint8_t bit = bitForPin(pin);
   uint8_t regAddr = regForPin(pin, MCP23017_GPIOA, MCP23017_GPIOB);
   return (readRegister(regAddr) >> bit) & 0x1;
@@ -303,7 +303,7 @@ uint8_t Adafruit_MCP23017::digitalRead(uint8_t pin) {
  * If you are connecting the INTA/B pin to arduino 2/3, you should configure the
  * interupt handling as FALLING with the default configuration.
  */
-void Adafruit_MCP23017::setupInterrupts(uint8_t mirroring, uint8_t openDrain,
+void housecatDeviceMcp23017::setupInterrupts(uint8_t mirroring, uint8_t openDrain,
                                         uint8_t polarity) {
   // configure the port A
   uint8_t ioconfValue = readRegister(MCP23017_IOCONA);
@@ -330,7 +330,7 @@ void Adafruit_MCP23017::setupInterrupts(uint8_t mirroring, uint8_t openDrain,
  * @param mode Mode to set the pin
  *
  */
-void Adafruit_MCP23017::setupInterruptPin(uint8_t pin, uint8_t mode) {
+void housecatDeviceMcp23017::setupInterruptPin(uint8_t pin, uint8_t mode) {
 
   // set the pin interrupt control (0 means change, 1 means compare against
   // given value);
@@ -353,7 +353,7 @@ void Adafruit_MCP23017::setupInterruptPin(uint8_t pin, uint8_t mode) {
  * @param pin Pin to set
  *
  */
-void Adafruit_MCP23017::disableInterruptPin(uint8_t pin) {
+void housecatDeviceMcp23017::disableInterruptPin(uint8_t pin) {
   // disable the pin for interrupt
   updateRegisterBit(pin, LOW, MCP23017_GPINTENA, MCP23017_GPINTENB);
 }
@@ -362,7 +362,7 @@ void Adafruit_MCP23017::disableInterruptPin(uint8_t pin) {
  * @brief Gets the last interrupt pin
  * @return Returns the last interrupt pin
  */
-uint8_t Adafruit_MCP23017::getLastInterruptPin() {
+uint8_t housecatDeviceMcp23017::getLastInterruptPin() {
   uint8_t intf;
 
   // try port A
@@ -383,7 +383,7 @@ uint8_t Adafruit_MCP23017::getLastInterruptPin() {
  * @brief Gets the value of the last interrupt pin
  * @return Returns the value of the last interrupt pin
  */
-uint8_t Adafruit_MCP23017::getLastInterruptPinValue() {
+uint8_t housecatDeviceMcp23017::getLastInterruptPinValue() {
   uint8_t intPin = getLastInterruptPin();
   if (intPin != MCP23017_INT_ERR) {
     uint8_t intcapreg = regForPin(intPin, MCP23017_INTCAPA, MCP23017_INTCAPB);

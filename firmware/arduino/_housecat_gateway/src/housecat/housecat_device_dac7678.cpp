@@ -1,7 +1,7 @@
 
-#include "DAC7678.h"
+#include "housecat_device_dac7678.h"
 
-unsigned createMask(unsigned a, unsigned b)
+unsigned housecatDeviceDac7678::createMask(unsigned a, unsigned b)
 {
    unsigned r = 0;
    for (unsigned i=a; i<=b; i++)
@@ -11,11 +11,11 @@ unsigned createMask(unsigned a, unsigned b)
 }
 
 
-DAC7678::DAC7678()
+housecatDeviceDac7678::housecatDeviceDac7678()
 {
 }
 
-void DAC7678::begin(uint8_t newDeviceAddress, bool enableInternalReference)
+void housecatDeviceDac7678::begin(uint8_t newDeviceAddress, bool enableInternalReference)
 {
   m_deviceAddress = newDeviceAddress;
   m_enableInternalReference = enableInternalReference;
@@ -29,7 +29,7 @@ void DAC7678::begin(uint8_t newDeviceAddress, bool enableInternalReference)
 }
 
 
-void DAC7678::writeDAC(uint16_t value, uint8_t DAC){
+void housecatDeviceDac7678::writeDAC(uint16_t value, uint8_t DAC){
   uint16_t MSDB2, LSDB2;
   
   unsigned r = createMask(0, 3);

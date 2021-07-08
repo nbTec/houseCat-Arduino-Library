@@ -1,9 +1,9 @@
 /*!
- * @file Adafruit_MCP23017.h
+ * @file housecat_device_mcp23017.h
  */
 
-#ifndef _Adafruit_MCP23017_H_
-#define _Adafruit_MCP23017_H_
+#ifndef HOUSECAT_DEVICE_MCP23017_H
+#define HOUSECAT_DEVICE_MCP23017_H
 
 // Don't forget the Wire library
 #ifndef ARDUINO_AVR_GEMMA
@@ -21,7 +21,7 @@
 /*!
  * @brief MCP23017 main class
  */
-class Adafruit_MCP23017 {
+class housecatDeviceMcp23017 {
 public:
   void begin(uint8_t addr, TwoWire *theWire = &Wire);
   void begin(TwoWire *theWire = &Wire);

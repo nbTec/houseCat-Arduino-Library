@@ -3,7 +3,7 @@
 #define _HOUSECAT_ANALOG_OUTPUTS_H_
 
 #include <Wire.h>
-#include "../DAC7678/DAC7678.h"
+#include "housecat_device_dac7678.h"
 
 #include "housecat_protocol.h"
 
@@ -17,7 +17,7 @@ class housecatAnalogOutputs
     static const uint8_t m_externalGain = 4;
     const float m_fullScale = 10.0;
 
-    DAC7678 m_dac;
+    housecatDeviceDac7678 m_dac;
     uint8_t m_mapping[m_dacOutputs];
     float m_output[m_dacOutputs];
 

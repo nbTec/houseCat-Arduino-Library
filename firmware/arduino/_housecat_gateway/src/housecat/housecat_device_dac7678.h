@@ -1,14 +1,14 @@
 
-#ifndef DAC7678_h
-#define DAC7678_h
+#ifndef HOUSECAT_DEVICE_DAC7678_H
+#define HOUSECAT_DEVICE_DAC7678_H
 
 #include "Arduino.h"
 #include <Wire.h>
 
-class DAC7678
+class housecatDeviceDac7678
 {
     public:
-        DAC7678();
+        housecatDeviceDac7678();
         
 		void begin(uint8_t newDeviceAddress, bool enableInternalReference);
         void writeDAC(uint16_t value, uint8_t DAC);
@@ -20,6 +20,8 @@ class DAC7678
 		
 		byte m_referenceConfig = 0x80;
         byte m_CA = 0x30;
+
+        static unsigned createMask(unsigned a, unsigned b);
 };
 
 #endif
