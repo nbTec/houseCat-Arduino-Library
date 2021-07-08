@@ -87,8 +87,8 @@ void housecatOutputs::init()
   
   for (int i = 0; i < m_ioExpanderQuantity; i++)
   {
-    m_ioExpander[i].begin(i + m_i2cBaseAddress);
-    current_value = m_ioExpander[i].readOLATAB();
+    m_ioExpander[i].begin_I2C(MCP23XXX_ADDR + i + m_i2cBaseAddress, &Wire);
+    //current_value = m_ioExpander[i].readOLATAB();
 	  //current_value = m_ioExpander[i].readOutputsAB();
     for (int j = 0; j < m_ioExpanderPins; j++)
     {

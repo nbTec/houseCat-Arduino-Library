@@ -86,7 +86,12 @@ void housecatInputs::init()
 {
   for (int i = 0; i < m_ioExpanderQuantity; i++)
   {
-    m_ioExpander[i].begin(i + m_i2cBaseAddress);
+    if(!m_ioExpander[i].begin_I2C(MCP23XXX_ADDR + i + m_i2cBaseAddress, &Wire))
+    {
+      Serial.print("Input IO Expander ");
+      Serial.print(i);
+      Serial.println(" Init Error");
+    }
     m_ioExpander[i].setupInterrupts(true, true, LOW);
     for (int j = 0; j < m_ioExpanderPins; j++)
     {
@@ -99,22 +104,24 @@ void housecatInputs::init()
 void housecatInputs::interruptCallback()
 {
   uint8_t interrupt_pin, value;
+  Serial.print("Interrupt: ");
   for (int i = 0; i < m_ioExpanderQuantity; i++)
   {
     interrupt_pin = m_ioExpander[i].getLastInterruptPin();
-    if (interrupt_pin != MCP23017_INT_ERR)
+    Serial.println(interrupt_pin);
+    if (interrupt_pin != 0xFF)
     {
-      value = m_ioExpander[i].getLastInterruptPinValue();
+      value = m_ioExpander[i].digitalRead(interrupt_pin);
       m_input[m_mapping[i][interrupt_pin]] = value;
 
       m_protocol.writeInputRaw(m_mapping[i][interrupt_pin] + 1, (bool) value);
 
-      /*Serial.print("IO Expander: ");
+      Serial.print("IO Expander: ");
       Serial.print(i);
       Serial.print(", Input: ");
       Serial.print(m_mapping[i][interrupt_pin]);
       Serial.print(", Value: ");
-      Serial.println(value);*/
+      Serial.println(value);
     }
   }
 }
