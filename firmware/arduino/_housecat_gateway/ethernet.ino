@@ -1,3 +1,4 @@
+
 void ethernetInit()
 {
   pinMode(ETH_ENABLE_PIN, OUTPUT);

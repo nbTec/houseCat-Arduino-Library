@@ -4,6 +4,8 @@
 
 #include "housecat_protocol.h"
 
+#include "housecat_onewire.h"
+
 #include "housecat_inputs.h"
 #include "housecat_input_button.h"
 #include "housecat_input_sensor.h"

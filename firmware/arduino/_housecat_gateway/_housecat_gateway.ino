@@ -40,6 +40,8 @@ void setup()
   housecatInit();
   ethernetInit();
 
+  onewire();
+
   //Enable one of the following three protocols by uncommenting them (only one can be used at the moment)
 
   protocol.modbusEnable();
@@ -73,7 +75,7 @@ void loop()
   inputHandler();
   heartbeatLed();
 
-  //UDP is used to read/control the raw IO, so the internal linkage is disabled when using UDP
+  //UDP is used to read/control the raw IO, so the internal IO linkage is disabled when using UDP
   if (!protocol.udpEnabled())
   {
     inputPolling();
