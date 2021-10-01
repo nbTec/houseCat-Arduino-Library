@@ -35,11 +35,11 @@ void housecatInit(void)
   //pinMode(ONEWIRE_SLEW_PIN, OUTPUT);
 
   digitalWrite(UART1_RTS_PIN, HIGH);
-  
+
   Serial.begin(115200);
   hcSerial1.begin(9600, SERIAL_8N1, UART1_RX_PIN, UART1_TX_PIN);
   hcSerial2.begin(9600, SERIAL_8N1, UART2_RX_PIN, UART2_TX_PIN);
-  
+
   Wire.begin(I2C_SDA_PIN, I2C_SCL_PIN, 400000);
   delay(50);
 }
@@ -81,6 +81,35 @@ void inputHandler()
   }
 }
 
+
+
+void outputsTest()
+{
+  static unsigned long timer = 0;
+  static bool state = false;
+
+  if ((millis() - timer) > 1000) //run every second;
+  {
+    timer = millis();
+    for (int i = 1; i <= 64; i++)
+      outputs.write(i, state);
+
+    state = not state;
+  }
+}
+
+void analogOutputsTest()
+{
+  analog_outputs.write(1,1.0);
+  analog_outputs.write(2,2.0);
+  analog_outputs.write(3,3.0);
+  analog_outputs.write(4,4.0);
+  analog_outputs.write(5,5.0);
+  analog_outputs.write(6,6.0);
+  analog_outputs.write(7,7.0);
+  analog_outputs.write(8,8.0);
+}
+
 void scanI2c()
 {
   byte error, address;
@@ -114,14 +143,14 @@ void scanI2c()
   }
 }
 
-void onewire(void) {
+void onewireTest(void) {
   byte i;
   byte present = 0;
   byte type_s;
   byte data[12];
   byte addr[8];
   float celsius, fahrenheit;
-  
+
   if ( !hcOneWire.search(addr)) {
     Serial.println("No more addresses.");
     Serial.println();
@@ -129,19 +158,19 @@ void onewire(void) {
     delay(250);
     return;
   }
-  
+
   Serial.print("ROM =");
-  for( i = 0; i < 8; i++) {
+  for ( i = 0; i < 8; i++) {
     Serial.write(' ');
     Serial.print(addr[i], HEX);
   }
 
   if (OneWire::crc8(addr, 7) != addr[7]) {
-      Serial.println("CRC is not valid!");
-      return;
+    Serial.println("CRC is not valid!");
+    return;
   }
   Serial.println();
- 
+
   // the first ROM byte indicates which chip
   switch (addr[0]) {
     case 0x10:
@@ -159,17 +188,17 @@ void onewire(void) {
     default:
       Serial.println("Device is not a DS18x20 family device.");
       return;
-  } 
+  }
 
   hcOneWire.reset();
   hcOneWire.select(addr);
   hcOneWire.write(0x44, 1);        // start conversion, with parasite power on at the end
-  
+
   delay(1000);     // maybe 750ms is enough, maybe not
   // we might do a ds.depower() here, but the reset will take care of it.
-  
+
   present = hcOneWire.reset();
-  hcOneWire.select(addr);    
+  hcOneWire.select(addr);
   hcOneWire.write(0xBE);         // Read Scratchpad
 
   Serial.print("  Data = ");

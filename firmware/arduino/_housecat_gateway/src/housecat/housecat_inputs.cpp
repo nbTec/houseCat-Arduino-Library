@@ -110,11 +110,11 @@ void housecatInputs::interruptCallback()
       m_protocol.writeInputRaw(m_mapping[i][interrupt_pin] + 1, (bool) value);
 
       /*Serial.print("IO Expander: ");
-      Serial.print(i);
-      Serial.print(", Input: ");
-      Serial.print(m_mapping[i][interrupt_pin]);
+      Serial.print(i);*/
+      Serial.print("Input: ");
+      Serial.print(m_mapping[i][interrupt_pin] + 1);
       Serial.print(", Value: ");
-      Serial.println(value);*/
+      Serial.println(value);
     }
   }
 }

@@ -40,8 +40,6 @@ void setup()
   housecatInit();
   ethernetInit();
 
-  onewire();
-
   //Enable one of the following three protocols by uncommenting them (only one can be used at the moment)
 
   protocol.modbusEnable();
@@ -62,6 +60,10 @@ void setup()
   analog_outputs.init();
   inputInterruptInit();
 
+  //Optional tests
+  //onewireTest();
+  analogOutputsTest();
+
   //Output additional settings
   lightHallway.enableAutoOff(30);
   lightHallway.enableMotion(10);
@@ -74,6 +76,8 @@ void loop()
   analog_outputs.poll();
   inputHandler();
   heartbeatLed();
+
+  //outputsTest();
 
   //UDP is used to read/control the raw IO, so the internal IO linkage is disabled when using UDP
   if (!protocol.udpEnabled())
@@ -100,8 +104,9 @@ void inputPolling()
 //Linking of inputs to output functions
 void outputPolling()
 {
+  //relay_name(toggle_input, reset_input, panic_input, motion_input)
   lightLivingRoom.poll(buttonLivingroom_1.shortPress());
-  lightHallway.poll(buttonHallway_1.shortPress() or buttonHallway_2.shortPress(), buttonAllOff.longPress(), motionSensorHallway.pulse(), buttonPanic.longPress());
+  lightHallway.poll(buttonHallway_1.shortPress() or buttonHallway_2.shortPress(), buttonAllOff.longPress(), buttonPanic.longPress(), motionSensorHallway.pulse());
   blindLivingRoom_1.poll(buttonBlind_1_Up.shortPress(), buttonBlind_1_Down.shortPress());
   dimmerLivingroom.poll(buttonLivingroom_2.shortPress(), buttonLivingroom_2.longPress());
 }

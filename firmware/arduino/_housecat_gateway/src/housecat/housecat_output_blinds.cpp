@@ -116,9 +116,10 @@ void housecatOutputBlinds::poll(bool upInput, bool downInput)
 		}
 		if (up_pressed or protocol_up)
 		{
-			relaysStop();
-			m_prvTimeMs = readTimeMs();
-			m_blindsState = switch_direction_down_to_up;
+			//relaysStop();
+			//m_prvTimeMs = readTimeMs();
+			//m_blindsState = switch_direction_down_to_up;
+			m_blindsState = stop;
 		}
 		if((readTimeSec() - m_prvTimeSec) >= m_travelTimeSec)
 		{
@@ -154,14 +155,14 @@ void housecatOutputBlinds::poll(bool upInput, bool downInput)
 	  case going_up:
 	  	if (down_pressed or protocol_down)
 		{
-			relaysStop();
-			m_prvTimeMs = readTimeMs();
-			m_blindsState = switch_direction_up_to_down;
+			//relaysStop();
+			//m_prvTimeMs = readTimeMs();
+			//m_blindsState = switch_direction_up_to_down;
+			m_blindsState = stop;
 		}
 		if (up_pressed or protocol_stop)
 		{
 			m_blindsState = stop;
-
 		}
 		if((readTimeSec() - m_prvTimeSec) >= m_travelTimeSec)
 		{
