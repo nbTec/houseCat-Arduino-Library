@@ -2,14 +2,11 @@
 #ifndef _HOUSECAT_OUTPUT_RELAY_H_
 #define _HOUSECAT_OUTPUT_RELAY_H_
 
-#include "housecat_outputs.h"
-#include "housecat_protocol.h"
+#include "housecat.h"
 
 class housecatOutputRelay
 {
   private:
-    housecatProtocol &m_protocol;
-    housecatOutputs &m_outputs;
     
     uint8_t m_outputNumber = 0;
     bool m_outputState = false;
@@ -32,7 +29,7 @@ class housecatOutputRelay
     unsigned long readTimeSec();
 
   public:
-    housecatOutputRelay(housecatProtocol &protocol, housecatOutputs &outputs, uint8_t outputNumber);
+    housecatOutputRelay(uint8_t outputNumber);
     
     void enableAutoOff(unsigned long time);
     void disableAutoOff();

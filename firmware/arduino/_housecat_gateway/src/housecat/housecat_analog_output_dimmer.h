@@ -2,14 +2,11 @@
 #ifndef _HOUSECAT_ANALOG_OUTPUT_DIMMER_H_
 #define _HOUSECAT_ANALOG_OUTPUT_DIMMER_H_
 
-#include "housecat_analog_outputs.h"
-#include "housecat_protocol.h"
+#include "housecat.h"
 
 class housecatAnalogOutputDimmer
 {
   private:
-    housecatProtocol &m_protocol;
-    housecatAnalogOutputs &m_analogOutputs;
 
     uint8_t m_outputNumber = 0;
     uint8_t m_startValue = 0;
@@ -28,7 +25,7 @@ class housecatAnalogOutputDimmer
     unsigned long readTimeMs();
 
   public:
-    housecatAnalogOutputDimmer(housecatProtocol &protocol, housecatAnalogOutputs &analogOutputs, uint8_t outputNumber, uint8_t startValue, uint8_t defaultValue);
+    housecatAnalogOutputDimmer(uint8_t outputNumber, uint8_t startValue, uint8_t defaultValue);
 
     void poll(bool toggleInput, bool cycleInput);
 };

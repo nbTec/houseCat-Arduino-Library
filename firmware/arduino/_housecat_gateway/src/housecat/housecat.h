@@ -17,10 +17,10 @@
 #include "housecat_analog_outputs.h"
 #include "housecat_analog_output_dimmer.h"
 
-housecatProtocol protocol;
+extern housecatProtocol g_housecat_protocol;
 
-housecatInputs inputs(protocol);
-housecatOutputs outputs(protocol);
-housecatAnalogOutputs analog_outputs(protocol);
+extern housecatInputs g_housecat_inputs;
+extern housecatOutputs g_housecat_outputs;
+extern housecatAnalogOutputs g_housecat_analog_outputs;
 
 #endif

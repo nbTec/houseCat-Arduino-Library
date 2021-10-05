@@ -2,14 +2,11 @@
 #ifndef _HOUSECAT_INPUT_BUTTON_H_
 #define _HOUSECAT_INPUT_BUTTON_H_
 
-#include "housecat_inputs.h"
-#include "housecat_protocol.h"
+#include "housecat.h"
 
 class housecatInputButton
 {
   private:
-    housecatProtocol &m_protocol;
-    housecatInputs &m_inputs;
     
     static const uint16_t m_longPressTimeMs   = 1000;
     static const uint16_t m_holdOffTimeMs     = 50;
@@ -26,7 +23,7 @@ class housecatInputButton
     unsigned long readTimeMs();
 
   public:
-    housecatInputButton(housecatProtocol &protocol, housecatInputs &inputs, uint8_t inputNumber);
+    housecatInputButton(uint8_t inputNumber);
 
     void poll();
 

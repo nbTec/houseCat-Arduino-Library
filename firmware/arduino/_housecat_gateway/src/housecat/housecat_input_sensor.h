@@ -2,14 +2,11 @@
 #ifndef _HOUSECAT_INPUT_SENSOR_H_
 #define _HOUSECAT_INPUT_SENSOR_H_
 
-#include "housecat_inputs.h"
-#include "housecat_protocol.h"
+#include "housecat.h"
 
 class housecatInputSensor
 {
   private:
-    housecatProtocol &m_protocol;
-    housecatInputs &m_inputs;
     
     static const uint16_t m_holdOffTimeMs     = 50;
 
@@ -24,7 +21,7 @@ class housecatInputSensor
     unsigned long readTimeMs();
 
   public:
-    housecatInputSensor(housecatProtocol &protocol, housecatInputs &inputs, uint8_t inputNumber);
+    housecatInputSensor(uint8_t inputNumber);
 
     void poll();
 

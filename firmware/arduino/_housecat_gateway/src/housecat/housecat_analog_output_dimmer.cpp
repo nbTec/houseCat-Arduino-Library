@@ -13,8 +13,8 @@
 #include "WProgram.h"
 #endif
 
-housecatAnalogOutputDimmer::housecatAnalogOutputDimmer(housecatProtocol &protocol, housecatAnalogOutputs &analogOutputs, uint8_t outputNumber, uint8_t startValue, uint8_t defaultValue)
-: m_protocol(protocol), m_analogOutputs(analogOutputs), m_outputNumber(outputNumber), m_startValue(startValue), m_outputValue(defaultValue)
+housecatAnalogOutputDimmer::housecatAnalogOutputDimmer(uint8_t outputNumber, uint8_t startValue, uint8_t defaultValue)
+: m_outputNumber(outputNumber), m_startValue(startValue), m_outputValue(defaultValue)
 {
 }
 
@@ -29,9 +29,9 @@ void housecatAnalogOutputDimmer::poll(bool toggleInput, bool cycleInput)
 
   if (m_firstPoll)
   {
-    m_protocol.addDimmer(m_outputNumber);
-    m_protocol.writeDimmerState(m_outputNumber, m_outputState);
-    m_protocol.writeDimmerValue(m_outputNumber, m_outputValue);
+    g_housecat_protocol.addDimmer(m_outputNumber);
+    g_housecat_protocol.writeDimmerState(m_outputNumber, m_outputState);
+    g_housecat_protocol.writeDimmerValue(m_outputNumber, m_outputValue);
     m_firstPoll = false;
   }
 
@@ -41,13 +41,13 @@ void housecatAnalogOutputDimmer::poll(bool toggleInput, bool cycleInput)
     
     if(m_outputState == true)
     {
-        m_analogOutputs.write(m_outputNumber, m_outputValue / 10);
+        g_housecat_analog_outputs.write(m_outputNumber, m_outputValue / 10);
     }
     else
     {
-        m_analogOutputs.write(m_outputNumber, 0.0);
+        g_housecat_analog_outputs.write(m_outputNumber, 0.0);
     }
-    m_protocol.writeDimmerState(m_outputNumber, m_outputState);
+    g_housecat_protocol.writeDimmerState(m_outputNumber, m_outputState);
   }
 
   if (cycleInput && m_outputState)
@@ -61,33 +61,33 @@ void housecatAnalogOutputDimmer::poll(bool toggleInput, bool cycleInput)
             m_outputValue = m_startValue;
         }
 
-        m_analogOutputs.write(m_outputNumber, m_outputValue / 10);
-        m_protocol.writeDimmerValue(m_outputNumber, m_outputValue);
+        g_housecat_analog_outputs.write(m_outputNumber, m_outputValue / 10);
+        g_housecat_protocol.writeDimmerValue(m_outputNumber, m_outputValue);
         m_prvCycleTimeMs = readTimeMs();
       }
   }
 
-  bool protocol_state = m_protocol.readDimmerState(m_outputNumber);
+  bool protocol_state = g_housecat_protocol.readDimmerState(m_outputNumber);
   if(m_outputState != protocol_state)
   {
     m_outputState = protocol_state;
     if(m_outputState == true)
     {
-        m_analogOutputs.write(m_outputNumber, m_outputValue / 10);
+        g_housecat_analog_outputs.write(m_outputNumber, m_outputValue / 10);
     }
     else
     {
-        m_analogOutputs.write(m_outputNumber, 0.0);
+        g_housecat_analog_outputs.write(m_outputNumber, 0.0);
     }
   }
 
-  uint8_t protocol_value = m_protocol.readDimmerValue(m_outputNumber);
+  uint8_t protocol_value = g_housecat_protocol.readDimmerValue(m_outputNumber);
   if(m_outputValue != protocol_value)
   {
     m_outputValue = protocol_value;
     if(m_outputState == true)
     {
-        m_analogOutputs.write(m_outputNumber, m_outputValue / 10);
+        g_housecat_analog_outputs.write(m_outputNumber, m_outputValue / 10);
     }
   }
 

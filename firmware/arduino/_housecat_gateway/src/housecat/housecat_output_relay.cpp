@@ -13,8 +13,8 @@
 #include "WProgram.h"
 #endif
 
-housecatOutputRelay::housecatOutputRelay(housecatProtocol &protocol, housecatOutputs &outputs, uint8_t outputNumber)
-: m_protocol(protocol), m_outputs(outputs), m_outputNumber(outputNumber)
+housecatOutputRelay::housecatOutputRelay(uint8_t outputNumber)
+: m_outputNumber(outputNumber)
 {
   
 }
@@ -52,25 +52,25 @@ void housecatOutputRelay::poll(bool toggleInput)
     
   if (m_firstPoll)
   {
-    m_outputState = m_outputs.read(m_outputNumber); //Update output state
-    m_protocol.addOutput(m_outputNumber);
-    m_protocol.writeOutput(m_outputNumber, m_outputState);
+    m_outputState = g_housecat_outputs.read(m_outputNumber); //Update output state
+    g_housecat_protocol.addOutput(m_outputNumber);
+    g_housecat_protocol.writeOutput(m_outputNumber, m_outputState);
     m_firstPoll = false;
   }
 
   if (toggle_pressed)
   {
     m_outputState = !m_outputState;
-    m_outputs.write(m_outputNumber, m_outputState);
-    m_protocol.writeOutput(m_outputNumber, m_outputState);
+    g_housecat_outputs.write(m_outputNumber, m_outputState);
+    g_housecat_protocol.writeOutput(m_outputNumber, m_outputState);
     m_autoOffStartTime = readTimeSec();
   }
 
-  uint8_t protocol_state = m_protocol.readOutput(m_outputNumber);
+  uint8_t protocol_state = g_housecat_protocol.readOutput(m_outputNumber);
   if(protocol_state != m_outputState)
   {
     m_outputState = protocol_state;
-    m_outputs.write(m_outputNumber, m_outputState);
+    g_housecat_outputs.write(m_outputNumber, m_outputState);
     m_autoOffStartTime = readTimeSec();
   }
 
@@ -79,8 +79,8 @@ void housecatOutputRelay::poll(bool toggleInput)
     if(m_autoOff && ((readTimeSec() - m_autoOffStartTime) >= m_autoOffTime))
     {
       m_outputState = false;
-      m_outputs.write(m_outputNumber, m_outputState);
-      m_protocol.writeOutput(m_outputNumber, m_outputState);
+      g_housecat_outputs.write(m_outputNumber, m_outputState);
+      g_housecat_protocol.writeOutput(m_outputNumber, m_outputState);
     }
   }
 
@@ -94,8 +94,8 @@ void housecatOutputRelay::poll(bool toggleInput, bool resetInput)
   if(reset_pressed)
   {
     m_outputState = false;
-    m_outputs.write(m_outputNumber, m_outputState);
-    m_protocol.writeOutput(m_outputNumber, m_outputState);
+    g_housecat_outputs.write(m_outputNumber, m_outputState);
+    g_housecat_protocol.writeOutput(m_outputNumber, m_outputState);
   }
 
   m_resetInputPrv = resetInput;
@@ -110,8 +110,8 @@ void housecatOutputRelay::poll(bool toggleInput, bool resetInput, bool panicInpu
   if(panic_pressed)
   {
     m_outputState = true;
-    m_outputs.write(m_outputNumber, m_outputState);
-    m_protocol.writeOutput(m_outputNumber, m_outputState);
+    g_housecat_outputs.write(m_outputNumber, m_outputState);
+    g_housecat_protocol.writeOutput(m_outputNumber, m_outputState);
   }
   
   m_panicInputPrv = panicInput;
@@ -127,16 +127,16 @@ void housecatOutputRelay::poll(bool toggleInput, bool resetInput, bool panicInpu
   {
     m_motionActive = true;
     m_outputState = true;
-    m_outputs.write(m_outputNumber, m_outputState);
-    m_protocol.writeOutput(m_outputNumber, m_outputState);
+    g_housecat_outputs.write(m_outputNumber, m_outputState);
+    g_housecat_protocol.writeOutput(m_outputNumber, m_outputState);
     m_motionStartTime = readTimeSec();
   }
 
   if(m_motionActive && ((readTimeSec() - m_motionStartTime) >= m_motionTime))
   {
     m_outputState = false;
-    m_outputs.write(m_outputNumber, m_outputState);
-    m_protocol.writeOutput(m_outputNumber, m_outputState);
+    g_housecat_outputs.write(m_outputNumber, m_outputState);
+    g_housecat_protocol.writeOutput(m_outputNumber, m_outputState);
     m_motionActive = false;
   }
   

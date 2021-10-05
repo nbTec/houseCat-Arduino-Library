@@ -13,8 +13,8 @@
 #include "WProgram.h"
 #endif
 
-housecatOutputBlinds::housecatOutputBlinds(housecatProtocol &protocol, housecatOutputs &outputs, uint8_t outputNumber_1, uint8_t outputNumber_2, uint16_t travelTimeSec)
-:m_protocol(protocol), m_outputs(outputs), m_outputNumber_1(outputNumber_1), m_outputNumber_2(outputNumber_2), m_travelTimeSec(travelTimeSec)
+housecatOutputBlinds::housecatOutputBlinds(uint8_t outputNumber_1, uint8_t outputNumber_2, uint16_t travelTimeSec)
+:m_outputNumber_1(outputNumber_1), m_outputNumber_2(outputNumber_2), m_travelTimeSec(travelTimeSec)
 {
 
 }
@@ -31,20 +31,20 @@ unsigned long housecatOutputBlinds::readTimeSec()
 
 void housecatOutputBlinds::relaysStop()
 {
-	m_outputs.write(m_outputNumber_1, false);
-	m_outputs.write(m_outputNumber_2, false);
+	g_housecat_outputs.write(m_outputNumber_1, false);
+	g_housecat_outputs.write(m_outputNumber_2, false);
 }
 
 void housecatOutputBlinds::relaysDown()
 {
-	m_outputs.write(m_outputNumber_1, true);
-	m_outputs.write(m_outputNumber_2, true);	
+	g_housecat_outputs.write(m_outputNumber_1, true);
+	g_housecat_outputs.write(m_outputNumber_2, true);	
 }
 
 void housecatOutputBlinds::relaysUp()
 {
-	m_outputs.write(m_outputNumber_1, true);
-	m_outputs.write(m_outputNumber_2, false);
+	g_housecat_outputs.write(m_outputNumber_1, true);
+	g_housecat_outputs.write(m_outputNumber_2, false);
 }
 
 void housecatOutputBlinds::poll(bool upInput, bool downInput)
@@ -52,15 +52,15 @@ void housecatOutputBlinds::poll(bool upInput, bool downInput)
   uint8_t up_pressed = upInput && (!m_upInputPrv);
   uint8_t down_pressed = downInput && (!m_downInputPrv);
 
-  enumProtocolBlindsState m_protocolExternalState = m_protocol.readBlind(m_outputNumber_1);
-  bool protocol_up = ((m_protocolInternalState != m_protocolExternalState) && (m_protocolExternalState == blind_up));
-  bool protocol_down = ((m_protocolInternalState != m_protocolExternalState) && (m_protocolExternalState == blind_down));
-  bool protocol_stop = ((m_protocolInternalState != m_protocolExternalState) && (m_protocolExternalState == blind_stop));
+  enumProtocolBlindsState protocolExternalState = g_housecat_protocol.readBlind(m_outputNumber_1);
+  bool protocol_up = ((m_protocolInternalState != protocolExternalState) && (protocolExternalState == blind_up));
+  bool protocol_down = ((m_protocolInternalState != protocolExternalState) && (protocolExternalState == blind_down));
+  bool protocol_stop = ((m_protocolInternalState != protocolExternalState) && (protocolExternalState == blind_stop));
   
   if (m_firstPoll)
   {
-	//m_protocol.addBlind(upInput);
-	m_protocol.writeBlind(m_outputNumber_1, m_protocolInternalState);
+	//g_housecat_protocol.addBlind(upInput);
+	g_housecat_protocol.writeBlind(m_outputNumber_1, m_protocolInternalState);
     m_firstPoll = false;
   }
   
@@ -69,7 +69,7 @@ void housecatOutputBlinds::poll(bool upInput, bool downInput)
 	  case stop:
 		relaysStop();
 		m_protocolInternalState = blind_stop;
-		m_protocol.writeBlind(m_outputNumber_1, m_protocolInternalState);
+		g_housecat_protocol.writeBlind(m_outputNumber_1, m_protocolInternalState);
 		m_blindsState = paused;
 	  	break;
 
@@ -78,26 +78,26 @@ void housecatOutputBlinds::poll(bool upInput, bool downInput)
 		{
 			m_blindsState = start_down;
 			m_protocolInternalState = blind_down;
-			m_protocol.writeBlind(m_outputNumber_1, m_protocolInternalState);
+			g_housecat_protocol.writeBlind(m_outputNumber_1, m_protocolInternalState);
 		}
 		if (up_pressed)
 		{
 			m_blindsState = start_up;
 			m_protocolInternalState = blind_up;
-			m_protocol.writeBlind(m_outputNumber_1, m_protocolInternalState);
+			g_housecat_protocol.writeBlind(m_outputNumber_1, m_protocolInternalState);
 		}
 		
-		if(m_protocolInternalState != m_protocolExternalState)
+		if(m_protocolInternalState != protocolExternalState)
 		{
-			if(m_protocolExternalState == blind_down)
+			if(protocolExternalState == blind_down)
 			{
 				m_blindsState = start_down;
 			}	
-			if(m_protocolExternalState == blind_up)
+			if(protocolExternalState == blind_up)
 			{
 				m_blindsState = start_up;
 			}	
-			m_protocolInternalState = m_protocolExternalState;
+			m_protocolInternalState = protocolExternalState;
 		}
 	  	break;
 
@@ -105,7 +105,7 @@ void housecatOutputBlinds::poll(bool upInput, bool downInput)
 		relaysDown();
 		m_prvTimeSec = readTimeSec();
 		m_protocolInternalState = blind_down;
-		m_protocol.writeBlind(m_outputNumber_1, m_protocolInternalState);
+		g_housecat_protocol.writeBlind(m_outputNumber_1, m_protocolInternalState);
 		m_blindsState = going_down;
 	  	break;
 
@@ -125,7 +125,7 @@ void housecatOutputBlinds::poll(bool upInput, bool downInput)
 		{
 			relaysStop();
 			m_protocolInternalState = blind_closed;
-			m_protocol.writeBlind(m_outputNumber_1, m_protocolInternalState);
+			g_housecat_protocol.writeBlind(m_outputNumber_1, m_protocolInternalState);
 			m_blindsState = closed;
 		}
 	  	break;
@@ -148,7 +148,7 @@ void housecatOutputBlinds::poll(bool upInput, bool downInput)
 	  	relaysUp();
 		m_prvTimeSec = readTimeSec();
 		m_protocolInternalState = blind_up;
-		m_protocol.writeBlind(m_outputNumber_1, m_protocolInternalState);
+		g_housecat_protocol.writeBlind(m_outputNumber_1, m_protocolInternalState);
 		m_blindsState = going_up;
 	  	break;
 
@@ -168,7 +168,7 @@ void housecatOutputBlinds::poll(bool upInput, bool downInput)
 		{
 			relaysStop();
 	  		m_protocolInternalState = blind_open;
-			m_protocol.writeBlind(m_outputNumber_1, m_protocolInternalState);
+			g_housecat_protocol.writeBlind(m_outputNumber_1, m_protocolInternalState);
 			m_blindsState = open;
 		}
 	  	break;

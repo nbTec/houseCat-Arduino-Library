@@ -76,7 +76,7 @@ void inputHandler()
 {
   if (input_interrupt || (digitalRead(INPUT_INT_PIN) == LOW))
   {
-    inputs.interruptCallback();
+    g_housecat_inputs.interruptCallback();
     input_interrupt = false;
   }
 }
@@ -92,7 +92,7 @@ void outputsTest()
   {
     timer = millis();
     for (int i = 1; i <= 64; i++)
-      outputs.write(i, state);
+      g_housecat_outputs.write(i, state);
 
     state = not state;
   }
@@ -100,14 +100,14 @@ void outputsTest()
 
 void analogOutputsTest()
 {
-  analog_outputs.write(1,1.0);
-  analog_outputs.write(2,2.0);
-  analog_outputs.write(3,3.0);
-  analog_outputs.write(4,4.0);
-  analog_outputs.write(5,5.0);
-  analog_outputs.write(6,6.0);
-  analog_outputs.write(7,7.0);
-  analog_outputs.write(8,8.0);
+  g_housecat_analog_outputs.write(1,1.0);
+  g_housecat_analog_outputs.write(2,2.0);
+  g_housecat_analog_outputs.write(3,3.0);
+  g_housecat_analog_outputs.write(4,4.0);
+  g_housecat_analog_outputs.write(5,5.0);
+  g_housecat_analog_outputs.write(6,6.0);
+  g_housecat_analog_outputs.write(7,7.0);
+  g_housecat_analog_outputs.write(8,8.0);
 }
 
 void scanI2c()
