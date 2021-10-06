@@ -67,6 +67,8 @@ void setup()
   //Output additional settings
   lightHallway.enableAutoOff(30);
   lightHallway.enableMotion(10);
+
+  blindLivingRoom_1.invertDirection(true);
 }
 
 void loop()

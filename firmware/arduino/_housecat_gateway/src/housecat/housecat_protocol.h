@@ -65,7 +65,7 @@ class housecatProtocol
     String m_udpSeparator = " ";
     String m_udpDigitalInputPrefix = "din";
     String m_udpDigitalOutputPrefix = "dout";
-    String m_udpAnalogOutoutPrefix = "aout";
+    String m_udpAnalogOutputPrefix = "aout";
     String m_udpDigitalInputString;
     String m_udpDigitalOutputString;
     String m_udpAnalogOutputString;

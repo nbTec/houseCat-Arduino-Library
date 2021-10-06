@@ -13,6 +13,7 @@ class housecatOutputBlinds
     uint8_t m_type = 0;
     uint16_t m_travelTimeSec = 30; //Travel time in seconds
     uint16_t m_switchDirectionTimeMs = 1000; //Time between a direction switch in milliseconds
+	bool m_invertDirection = false;
 
     enumProtocolBlindsState m_protocolInternalState = blind_open;
 	
@@ -37,6 +38,8 @@ class housecatOutputBlinds
 
   public:
     housecatOutputBlinds(uint8_t outputNumber_1, uint8_t outputNumber_2, uint16_t travelTimeSec);
+	
+	void invertDirection(bool state);
 
     void poll(bool upInput, bool downInput);
 };

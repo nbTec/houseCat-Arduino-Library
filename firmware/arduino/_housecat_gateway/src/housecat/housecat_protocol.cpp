@@ -99,7 +99,7 @@ void housecatProtocol::init()
   {
     m_udpDigitalInputString =  m_udpDeviceName + String(m_udpDeviceAddress) + m_udpSeparator + m_udpDigitalInputPrefix;
     m_udpDigitalOutputString =  m_udpDeviceName + String(m_udpDeviceAddress) + m_udpSeparator + m_udpDigitalOutputPrefix;
-    m_udpAnalogOutputString =  m_udpDeviceName + String(m_udpDeviceAddress) + m_udpSeparator + m_udpAnalogOutoutPrefix;
+    m_udpAnalogOutputString =  m_udpDeviceName + String(m_udpDeviceAddress) + m_udpSeparator + m_udpAnalogOutputPrefix;
 
     m_udpSend.begin(m_udpSendPort);
     m_udpReceive.begin(m_udpReceivePort);
@@ -363,19 +363,19 @@ void housecatProtocol::writeBlind(uint8_t output, enumProtocolBlindsState state)
     switch(state)
     {
       case blind_stop:
-        m_modbusTcp.Coil(output, true);
+        //m_modbusTcp.Coil(output, false);
       break;
       case blind_up:
-
+		//m_modbusTcp.Coil(output, false);
       break;
       case blind_down:
- 
+		//m_modbusTcp.Coil(output, false);
       break;
       case blind_open:
-
+		m_modbusTcp.Coil(output, false);
       break;
       case blind_closed:
-
+		m_modbusTcp.Coil(output, true);
       break;
       default:
       break;
@@ -581,10 +581,10 @@ void housecatProtocol::poll()
   {
     uint8_t udp_buffer[50];
     String udp_string;
-    memset(udp_buffer, 0, 50);
+    memset(udp_buffer, 0, sizeof(udp_buffer));
     m_udpReceive.parsePacket();
 
-    if(m_udpReceive.read(udp_buffer, 50) > 0)
+    if(m_udpReceive.read(udp_buffer, sizeof(udp_buffer)) > 0)
     {
       udp_string = (char*) udp_buffer;
 

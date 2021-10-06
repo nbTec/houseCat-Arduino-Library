@@ -35,16 +35,21 @@ void housecatOutputBlinds::relaysStop()
 	g_housecat_outputs.write(m_outputNumber_2, false);
 }
 
+void housecatOutputBlinds::invertDirection(bool state)
+{
+	m_invertDirection = state;
+}
+
 void housecatOutputBlinds::relaysDown()
 {
 	g_housecat_outputs.write(m_outputNumber_1, true);
-	g_housecat_outputs.write(m_outputNumber_2, true);	
+	g_housecat_outputs.write(m_outputNumber_2, !m_invertDirection);
 }
 
 void housecatOutputBlinds::relaysUp()
 {
 	g_housecat_outputs.write(m_outputNumber_1, true);
-	g_housecat_outputs.write(m_outputNumber_2, false);
+	g_housecat_outputs.write(m_outputNumber_2, m_invertDirection);
 }
 
 void housecatOutputBlinds::poll(bool upInput, bool downInput)
