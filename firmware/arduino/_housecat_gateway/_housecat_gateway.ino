@@ -5,7 +5,7 @@
 
 
 //Input buttons declaration (add poll to inputPolling function below)
-//housecatInputButton button_name(protocol, inputs, input_pin_number);
+//housecatInputButton button_name(input_number);
 housecatInputButton buttonLivingroom_1(1);
 housecatInputButton buttonLivingroom_2(2);
 housecatInputButton buttonHallway_1(3);
@@ -16,17 +16,17 @@ housecatInputButton buttonAllOff(7);
 housecatInputButton buttonPanic(8);
 
 //Input sensor declaration (add poll to inputPolling function below)
-//housecatInputSensor button_name(input_pin_number);
+//housecatInputSensor sensor_name(input_number);
 housecatInputSensor motionSensorHallway(9);
 
 
 //Output relays declaration (add poll to outputPolling function below)
-//housecatOutputRelay relay_name(output_pin_number);
+//housecatOutputRelay relay_name(output_number);
 housecatOutputRelay lightLivingRoom(1);
 housecatOutputRelay lightHallway(2);
 
 //Blinds declaration (add poll to outputPolling function below)
-//housecatOutputBlinds blind_name(output_pin_numer_onoff, output_pin_numer_updown, travel_time_s);
+//housecatOutputBlinds blind_name(on_off_output_number, up_down_output_number, travel_time_seconds);
 housecatOutputBlinds blindLivingRoom_1(3, 4, 30);
 
 
