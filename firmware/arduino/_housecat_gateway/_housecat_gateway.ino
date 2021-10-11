@@ -1,8 +1,7 @@
 
-#include <ETH.h>
 #include "src/housecat/housecat.h"
-#include "_housecat_gateway.h"
 
+housecat hc;
 
 //Input buttons declaration (add poll to inputPolling function below)
 //housecatInputButton button_name(input_number);
@@ -37,8 +36,7 @@ housecatAnalogOutputDimmer dimmerLivingroom(1, 10, 70);
 
 void setup()
 {
-  housecatInit();
-  ethernetInit();
+  hc.init();
 
   //Enable one of the following three protocols by uncommenting them (only one can be used at the moment)
 
@@ -53,16 +51,9 @@ void setup()
   //g_housecat_protocol.udpSetSender(IPAddress(192, 168, 1, 101), 44444);
   //g_housecat_protocol.udpSetReceiver(55555);
 
-  //Initialisation
-  g_housecat_protocol.init();
-  g_housecat_inputs.init();
-  g_housecat_outputs.init();
-  g_housecat_analog_outputs.init();
-  inputInterruptInit();
-
   //Optional tests
-  //onewireTest();
-  analogOutputsTest();
+  //hc.onewireTest();
+  //hc.analogOutputsTest();
 
   //Output additional settings
   lightHallway.enableAutoOff(30);
@@ -73,14 +64,8 @@ void setup()
 
 void loop()
 {
-  g_housecat_protocol.poll();
-  g_housecat_outputs.poll();
-  g_housecat_analog_outputs.poll();
-  inputHandler();
-  heartbeatLed();
-
-  //outputsTest();
-
+  hc.poll();
+  
   //UDP is used to read/control the raw IO, so the internal IO linkage is disabled when using UDP
   if (!g_housecat_protocol.udpEnabled())
   {

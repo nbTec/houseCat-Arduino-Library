@@ -144,7 +144,7 @@ sample code bearing this copyright.
 #include "housecat_onewire_direct_gpio.h"
 
 
-void OneWire::begin(uint8_t pin_input, uint8_t pin_output)
+void housecatOneWire::begin(uint8_t pin_input, uint8_t pin_output)
 {
 	pinMode(pin_input, INPUT);
   pinMode(pin_output, OUTPUT);
@@ -164,7 +164,7 @@ void OneWire::begin(uint8_t pin_input, uint8_t pin_output)
 //
 // Returns 1 if a device asserted a presence pulse, 0 otherwise.
 //
-uint8_t OneWire::reset(void)
+uint8_t housecatOneWire::reset(void)
 {
 	IO_REG_TYPE input_mask IO_REG_MASK_ATTR = input_bitmask;
 	volatile IO_REG_TYPE *input_reg IO_REG_BASE_ATTR = input_baseReg;
@@ -201,7 +201,7 @@ uint8_t OneWire::reset(void)
 // Write a bit. Port and bit is used to cut lookup time and provide
 // more certain timing.
 //
-void OneWire::write_bit(uint8_t v)
+void housecatOneWire::write_bit(uint8_t v)
 {
   IO_REG_TYPE output_mask IO_REG_MASK_ATTR = output_bitmask;
 	volatile IO_REG_TYPE *output_reg IO_REG_BASE_ATTR = output_baseReg;
@@ -227,7 +227,7 @@ void OneWire::write_bit(uint8_t v)
 // Read a bit. Port and bit is used to cut lookup time and provide
 // more certain timing.
 //
-uint8_t OneWire::read_bit(void)
+uint8_t housecatOneWire::read_bit(void)
 {
 	IO_REG_TYPE input_mask IO_REG_MASK_ATTR = input_bitmask;
 	volatile IO_REG_TYPE *input_reg IO_REG_BASE_ATTR = input_baseReg;
@@ -253,11 +253,11 @@ uint8_t OneWire::read_bit(void)
 // go tri-state at the end of the write to avoid heating in a short or
 // other mishap.
 //
-void OneWire::write(uint8_t v, uint8_t power /* = 0 */) {
+void housecatOneWire::write(uint8_t v, uint8_t power /* = 0 */) {
     uint8_t bitMask;
 
     for (bitMask = 0x01; bitMask; bitMask <<= 1) {
-	OneWire::write_bit( (bitMask & v)?1:0);
+	housecatOneWire::write_bit( (bitMask & v)?1:0);
     }
     if ( !power) {
 	noInterrupts();
@@ -267,7 +267,7 @@ void OneWire::write(uint8_t v, uint8_t power /* = 0 */) {
     }
 }
 
-void OneWire::write_bytes(const uint8_t *buf, uint16_t count, bool power /* = 0 */) {
+void housecatOneWire::write_bytes(const uint8_t *buf, uint16_t count, bool power /* = 0 */) {
   for (uint16_t i = 0 ; i < count ; i++)
     write(buf[i]);
   if (!power) {
@@ -281,17 +281,17 @@ void OneWire::write_bytes(const uint8_t *buf, uint16_t count, bool power /* = 0 
 //
 // Read a byte
 //
-uint8_t OneWire::read() {
+uint8_t housecatOneWire::read() {
     uint8_t bitMask;
     uint8_t r = 0;
 
     for (bitMask = 0x01; bitMask; bitMask <<= 1) {
-	if ( OneWire::read_bit()) r |= bitMask;
+	if ( housecatOneWire::read_bit()) r |= bitMask;
     }
     return r;
 }
 
-void OneWire::read_bytes(uint8_t *buf, uint16_t count) {
+void housecatOneWire::read_bytes(uint8_t *buf, uint16_t count) {
   for (uint16_t i = 0 ; i < count ; i++)
     buf[i] = read();
 }
@@ -299,7 +299,7 @@ void OneWire::read_bytes(uint8_t *buf, uint16_t count) {
 //
 // Do a ROM select
 //
-void OneWire::select(const uint8_t rom[8])
+void housecatOneWire::select(const uint8_t rom[8])
 {
     uint8_t i;
 
@@ -311,12 +311,12 @@ void OneWire::select(const uint8_t rom[8])
 //
 // Do a ROM skip
 //
-void OneWire::skip()
+void housecatOneWire::skip()
 {
     write(0xCC);           // Skip ROM
 }
 
-void OneWire::depower()
+void housecatOneWire::depower()
 {
 	noInterrupts();
 	DIRECT_MODE_INPUT(input_baseReg, input_bitmask);
@@ -329,7 +329,7 @@ void OneWire::depower()
 // You need to use this function to start a search again from the beginning.
 // You do not need to do it for the first search, though you could.
 //
-void OneWire::reset_search()
+void housecatOneWire::reset_search()
 {
   // reset the search state
   LastDiscrepancy = 0;
@@ -344,7 +344,7 @@ void OneWire::reset_search()
 // Setup the search to find the device type 'family_code' on the next call
 // to search(*newAddr) if it is present.
 //
-void OneWire::target_search(uint8_t family_code)
+void housecatOneWire::target_search(uint8_t family_code)
 {
    // set the search state to find SearchFamily type devices
    ROM_NO[0] = family_code;
@@ -358,10 +358,10 @@ void OneWire::target_search(uint8_t family_code)
 //
 // Perform a search. If this function returns a '1' then it has
 // enumerated the next device and you may retrieve the ROM from the
-// OneWire::address variable. If there are no devices, no further
+// housecatOneWire::address variable. If there are no devices, no further
 // devices, or something horrible happens in the middle of the
 // enumeration then a 0 is returned.  If a new device is found then
-// its address is copied to newAddr.  Use OneWire::reset_search() to
+// its address is copied to newAddr.  Use housecatOneWire::reset_search() to
 // start over.
 //
 // --- Replaced by the one from the Dallas Semiconductor web site ---
@@ -371,7 +371,7 @@ void OneWire::target_search(uint8_t family_code)
 // Return TRUE  : device found, ROM number in ROM_NO buffer
 //        FALSE : device not found, end of search
 //
-bool OneWire::search(uint8_t *newAddr, bool search_mode /* = true */)
+bool housecatOneWire::search(uint8_t *newAddr, bool search_mode /* = true */)
 {
    uint8_t id_bit_number;
    uint8_t last_zero, rom_byte_number;
@@ -507,7 +507,7 @@ static const uint8_t PROGMEM dscrc2x16_table[] = {
 
 // Compute a Dallas Semiconductor 8 bit CRC. These show up in the ROM
 // and the registers.  (Use tiny 2x16 entry CRC table)
-uint8_t OneWire::crc8(const uint8_t *addr, uint8_t len)
+uint8_t housecatOneWire::crc8(const uint8_t *addr, uint8_t len)
 {
 	uint8_t crc = 0;
 
@@ -524,7 +524,7 @@ uint8_t OneWire::crc8(const uint8_t *addr, uint8_t len)
 // Compute a Dallas Semiconductor 8 bit CRC directly.
 // this is much slower, but a little smaller, than the lookup table.
 //
-uint8_t OneWire::crc8(const uint8_t *addr, uint8_t len)
+uint8_t housecatOneWire::crc8(const uint8_t *addr, uint8_t len)
 {
 	uint8_t crc = 0;
 
@@ -546,13 +546,13 @@ uint8_t OneWire::crc8(const uint8_t *addr, uint8_t len)
 #endif
 
 #if ONEWIRE_CRC16
-bool OneWire::check_crc16(const uint8_t* input, uint16_t len, const uint8_t* inverted_crc, uint16_t crc)
+bool housecatOneWire::check_crc16(const uint8_t* input, uint16_t len, const uint8_t* inverted_crc, uint16_t crc)
 {
     crc = ~crc16(input, len, crc);
     return (crc & 0xFF) == inverted_crc[0] && (crc >> 8) == inverted_crc[1];
 }
 
-uint16_t OneWire::crc16(const uint8_t* input, uint16_t len, uint16_t crc)
+uint16_t housecatOneWire::crc16(const uint8_t* input, uint16_t len, uint16_t crc)
 {
 #if defined(__AVR__)
     for (uint16_t i = 0 ; i < len ; i++) {

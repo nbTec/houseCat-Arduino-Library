@@ -41,9 +41,9 @@ void housecatDeviceDac7678::writeDAC(uint16_t value, uint8_t DAC){
   MSDB2 = MSDB2 >> 4;
   
   //Wire.begin();
-  Wire.beginTransmission(m_deviceAddress); // hex 48, B1001000
-  Wire.write(m_CA + DAC);    //CA byte
-  Wire.write(MSDB2);  //MSDB
-  Wire.write(LSDB2);  //LSDB
+  Wire.beginTransmission(m_deviceAddress); //hex 48, B1001000
+  Wire.write(m_CA + DAC); //CA byte
+  Wire.write(MSDB2); //MSDB
+  Wire.write(LSDB2); //LSDB
   Wire.endTransmission();
 }

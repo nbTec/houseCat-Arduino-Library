@@ -111,10 +111,13 @@ void housecatInputs::interruptCallback()
 
       /*Serial.print("IO Expander: ");
       Serial.print(i);*/
-      Serial.print("Input: ");
-      Serial.print(m_mapping[i][interrupt_pin] + 1);
-      Serial.print(", Value: ");
-      Serial.println(value);
+      if(value)
+      {
+        Serial.print("Input: ");
+        Serial.println(m_mapping[i][interrupt_pin] + 1);
+        //Serial.print(", Value: ");
+        //Serial.println(value);
+      }
     }
   }
 }

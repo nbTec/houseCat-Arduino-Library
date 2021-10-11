@@ -54,7 +54,7 @@
 // Board-specific macros for direct GPIO
 #include "housecat_onewire_direct_regtype.h"
 
-class OneWire
+class housecatOneWire
 {
   private:
     IO_REG_TYPE input_bitmask;
@@ -71,8 +71,8 @@ class OneWire
 #endif
 
   public:
-    OneWire() { }
-    OneWire(uint8_t pin_input, uint8_t pin_output) { begin(pin_input, pin_output); }
+    housecatOneWire() { }
+    housecatOneWire(uint8_t pin_input, uint8_t pin_output) { begin(pin_input, pin_output); }
     void begin(uint8_t pin_input, uint8_t pin_output);
 
     // Perform a 1-Wire reset cycle. Returns 1 if a device responds

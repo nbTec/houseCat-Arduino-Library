@@ -51,6 +51,10 @@ void housecatInputButton::poll()
         {
           m_inputState = falling_edge;
         }
+        else
+        {
+          m_inputState = rising_edge;
+        }
       }
       break;
 
