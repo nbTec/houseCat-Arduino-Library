@@ -15,6 +15,7 @@
 
 #include "housecat_outputs.h"
 #include "housecat_output_relay.h"
+#include "housecat_output_teleruptor.h"
 #include "housecat_output_blinds.h"
 
 #include "housecat_analog_outputs.h"
