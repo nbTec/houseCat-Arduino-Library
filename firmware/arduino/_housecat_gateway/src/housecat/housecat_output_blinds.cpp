@@ -58,8 +58,8 @@ void housecatOutputBlinds::poll(bool upInput, bool downInput)
   uint8_t down_pressed = downInput && (!m_downInputPrv);
 
   enumProtocolBlindsState protocolExternalState = g_housecat_protocol.readBlind(m_outputNumber_1);
-  bool protocol_up = ((m_protocolInternalState != protocolExternalState) && (protocolExternalState == blind_up));
   bool protocol_down = ((m_protocolInternalState != protocolExternalState) && (protocolExternalState == blind_down));
+  bool protocol_up = ((m_protocolInternalState != protocolExternalState) && (protocolExternalState == blind_up));
   bool protocol_stop = ((m_protocolInternalState != protocolExternalState) && (protocolExternalState == blind_stop));
   
   if (m_firstPoll)
@@ -92,16 +92,14 @@ void housecatOutputBlinds::poll(bool upInput, bool downInput)
 			g_housecat_protocol.writeBlind(m_outputNumber_1, m_protocolInternalState);
 		}
 		
-		if(m_protocolInternalState != protocolExternalState)
+		if(protocol_down)
 		{
-			if(protocolExternalState == blind_down)
-			{
-				m_blindsState = start_down;
-			}	
-			if(protocolExternalState == blind_up)
-			{
-				m_blindsState = start_up;
-			}	
+			m_blindsState = start_down;
+			m_protocolInternalState = protocolExternalState;
+		}	
+		if(protocol_up)
+		{
+			m_blindsState = start_up;
 			m_protocolInternalState = protocolExternalState;
 		}
 	  	break;

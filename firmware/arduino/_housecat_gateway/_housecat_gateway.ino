@@ -92,8 +92,8 @@ void inputPolling()
 void outputPolling()
 {
   //relay_name(toggle_input, reset_input, panic_input, motion_input)
-  lightLivingRoom.poll(buttonLivingroom_1.shortPress());
-  lightHallway.poll(buttonHallway_1.shortPress() or buttonHallway_2.shortPress(), buttonAllOff.longPress(), buttonPanic.longPress(), motionSensorHallway.pulse());
-  blindLivingRoom_1.poll(buttonBlind_1_Up.shortPress(), buttonBlind_1_Down.shortPress());
-  dimmerLivingroom.poll(buttonLivingroom_2.shortPress(), buttonLivingroom_2.longPress());
+  lightLivingRoom.poll    (buttonLivingroom_1.shortPress());
+  lightHallway.poll       (buttonHallway_1.shortPress() or buttonHallway_2.shortPress(), buttonAllOff.longPress(), buttonPanic.longPress(), motionSensorHallway.pulse());
+  blindLivingRoom_1.poll  (buttonBlind_1_Up.shortPress(), buttonBlind_1_Down.shortPress());
+  dimmerLivingroom.poll   (buttonLivingroom_2.shortPress(), buttonLivingroom_2.longPress());
 }

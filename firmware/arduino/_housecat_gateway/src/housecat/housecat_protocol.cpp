@@ -363,19 +363,19 @@ void housecatProtocol::writeBlind(uint8_t output, enumProtocolBlindsState state)
     switch(state)
     {
       case blind_stop:
-        //m_modbusTcp.Coil(output, false);
+      //m_modbusTcp.Coil(output, false);
       break;
       case blind_up:
-		//m_modbusTcp.Coil(output, false);
+		  //m_modbusTcp.Coil(output, false);
       break;
       case blind_down:
-		//m_modbusTcp.Coil(output, false);
+		  //m_modbusTcp.Coil(output, false);
       break;
       case blind_open:
-		m_modbusTcp.Coil(output, false);
+		  m_modbusTcp.Coil(output, false);
       break;
       case blind_closed:
-		m_modbusTcp.Coil(output, true);
+		  m_modbusTcp.Coil(output, true);
       break;
       default:
       break;
