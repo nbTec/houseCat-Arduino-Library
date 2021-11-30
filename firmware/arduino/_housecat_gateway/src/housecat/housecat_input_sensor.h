@@ -11,6 +11,7 @@ class housecatInputSensor
     static const uint16_t m_holdOffTimeMs     = 50;
 
     uint8_t m_inputNumber;
+    bool m_activeState = true;
     unsigned long m_timerPrv = 0;
     bool m_pulse;
     bool m_firstPoll = true;
@@ -21,7 +22,7 @@ class housecatInputSensor
     unsigned long readTimeMs();
 
   public:
-    housecatInputSensor(uint8_t inputNumber);
+    housecatInputSensor(uint8_t inputNumber, bool activeState);
 
     void poll();
 

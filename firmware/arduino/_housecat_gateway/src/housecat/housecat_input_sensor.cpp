@@ -13,8 +13,8 @@
 #include "WProgram.h"
 #endif
 
-housecatInputSensor::housecatInputSensor(uint8_t inputNumber)
-: m_inputNumber(inputNumber)
+housecatInputSensor::housecatInputSensor(uint8_t inputNumber, bool activeState)
+: m_inputNumber(inputNumber), m_activeState(activeState)
 {
 
 }
@@ -26,17 +26,24 @@ unsigned long housecatInputSensor::readTimeMs()
 
 void housecatInputSensor::poll()
 {
+  bool input_state = false;
+
   if(m_firstPoll)
   {
     g_housecat_protocol.addInputSensor(m_inputNumber);
     m_firstPoll = false;
   }
 
+  if(m_activeState)
+    input_state = g_housecat_inputs.read(m_inputNumber);
+  else
+    input_state = !g_housecat_inputs.read(m_inputNumber);
+
   switch (m_inputState)
   {
     case rising_edge:
       m_pulse = false;
-      if (g_housecat_inputs.read(m_inputNumber))
+      if (input_state)
       {
         m_inputState = rising_edge_holdoff;
         m_timerPrv = readTimeMs();
@@ -46,7 +53,7 @@ void housecatInputSensor::poll()
     case rising_edge_holdoff:
       if ((readTimeMs() - m_timerPrv) > m_holdOffTimeMs)
       {
-        if (g_housecat_inputs.read(m_inputNumber))
+        if (input_state)
         {
           m_pulse = true;
           g_housecat_protocol.writeInputSensor(m_inputNumber, true);
@@ -56,7 +63,7 @@ void housecatInputSensor::poll()
       break;
 
     case falling_edge:
-      if (!g_housecat_inputs.read(m_inputNumber))
+      if (!input_state)
       {
         m_inputState = falling_edge_holdoff;
       }
