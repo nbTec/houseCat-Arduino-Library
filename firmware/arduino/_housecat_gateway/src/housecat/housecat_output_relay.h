@@ -39,8 +39,8 @@ class housecatOutputRelay
 
     void poll(bool toggleInput);
     void poll(bool toggleInput, bool resetInput);
-    void poll(bool toggleInput, bool resetInput, bool motionInput);
-    void poll(bool toggleInput, bool resetInput, bool motionInput, bool panicInput);
+    void poll(bool toggleInput, bool resetInput, bool panicInput);
+    void poll(bool toggleInput, bool resetInput, bool panicInput, bool motionInput);
 };
 
 #endif
