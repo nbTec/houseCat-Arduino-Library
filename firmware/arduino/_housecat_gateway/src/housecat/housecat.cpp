@@ -26,7 +26,7 @@ void housecatNetworkEvent(WiFiEvent_t event)
     case SYSTEM_EVENT_ETH_START:
       Serial.println("ETH Started");
       //set eth hostname here
-      ETH.setHostname("housecat");
+      ETH.setHostname(housecat_hostname);
       break;
     case SYSTEM_EVENT_ETH_CONNECTED:
       Serial.println("ETH Connected");
@@ -124,6 +124,8 @@ void housecat::init()
   g_housecat_analog_outputs.init();
 
   ethernetInit();
+
+  Serial.println("Housecat Started");
 }
 
 void housecat::poll()
@@ -185,7 +187,7 @@ void housecat::scanI2c()
       nDevices++;
     }
     else if (error == 4) {
-      Serial.print("Unknow error at address 0x");
+      Serial.print("Unknown error at address 0x");
       if (address < 16) {
         Serial.print("0");
       }

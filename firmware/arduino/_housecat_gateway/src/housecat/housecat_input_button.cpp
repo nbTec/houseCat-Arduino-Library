@@ -48,13 +48,9 @@ void housecatInputButton::poll()
       if ((readTimeMs() - m_timerPrv) > m_holdOffTimeMs)
       {
         if (g_housecat_inputs.read(m_inputNumber))
-        {
           m_inputState = falling_edge;
-        }
         else
-        {
           m_inputState = rising_edge;
-        }
       }
       break;
 

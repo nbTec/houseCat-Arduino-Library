@@ -32,6 +32,8 @@ extern HardwareSerial hcSerial2;
 
 extern housecatOneWire hcOneWire;
 
+#define housecat_hostname  "housecat-gateway"
+
 #define ONEWIRE_SLEW_PIN  2
 #define ONEWIRE_PIN       5
 #define UART1_RTS_PIN     12

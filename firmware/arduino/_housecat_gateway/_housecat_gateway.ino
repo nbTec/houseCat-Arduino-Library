@@ -15,8 +15,8 @@ housecatInputButton buttonAllOff(7);
 housecatInputButton buttonPanic(8);
 
 //Input sensor declaration (add poll to inputPolling function below)
-//housecatInputSensor sensor_name(input_number);
-housecatInputSensor motionSensorHallway(9);
+//housecatInputSensor sensor_name(input_number, active_state);
+housecatInputSensor motionSensorHallway(9, LOW);
 
 
 //Output relays declaration (add poll to outputPolling function below)
