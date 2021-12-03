@@ -17,9 +17,7 @@ bool housecatProtocol::m_mqttCallback;
 String housecatProtocol::m_mqttReceivedTopic;
 String housecatProtocol::m_mqttReceivedPayload;
 
-housecatProtocol::housecatProtocol()
-{
-}
+housecatProtocol::housecatProtocol() {}
 
 void housecatProtocol::modbusEnable()
 {
@@ -27,6 +25,12 @@ void housecatProtocol::modbusEnable()
   m_mqttEnabled = false;
   m_udpEnabled = false;
 }
+
+bool housecatProtocol::modbusEnabled()
+{
+  return m_modbusEnabled;
+}
+
 
 void housecatProtocol::mqttEnable()
 {
@@ -84,9 +88,7 @@ void housecatProtocol::mqttSetBrokerCredentials(String username, String password
 void housecatProtocol::init()
 {
   if(m_modbusEnabled)
-  {
     m_modbusTcp.server();
-  }
   
   if(m_mqttEnabled)
   {
@@ -171,9 +173,7 @@ void housecatProtocol::writeInputRaw(uint8_t input, bool state)
 bool housecatProtocol::readOutputRaw(uint8_t output)
 {
   if(m_udpEnabled)
-  {
     return m_udpOutputs[output];
-  }
 
   return false;
 }
@@ -181,9 +181,7 @@ bool housecatProtocol::readOutputRaw(uint8_t output)
 int housecatProtocol::readAnalogOutputRaw(uint8_t output)
 {
   if(m_udpEnabled)
-  {
     return m_udpAnalogOutputs[output];
-  }
 
   return 0;
 }
@@ -245,9 +243,7 @@ bool housecatProtocol::addInputSensor(uint8_t input)
   bool ret = false;
 
   if(m_modbusEnabled)
-  {
     ret = m_modbusTcp.addIsts(input);
-  }
 
   return ret;
 }
@@ -274,9 +270,7 @@ void housecatProtocol::writeInputSensor(uint8_t input, bool state)
 bool housecatProtocol::addOutput(uint8_t output)
 {
   if(m_modbusEnabled)
-  {
     return m_modbusTcp.addCoil(output);
-  }
 
   /*
   if(m_mqttEnabled)
@@ -293,14 +287,10 @@ bool housecatProtocol::addOutput(uint8_t output)
 bool housecatProtocol::readOutput(uint8_t output)
 {
   if(m_modbusEnabled)
-  {
     return m_modbusTcp.Coil(output);
-  }
 
   if(m_mqttEnabled)
-  {
     return m_mqttOutputs[output];
-  }
 
   return false;
 }
@@ -308,9 +298,7 @@ bool housecatProtocol::readOutput(uint8_t output)
 void housecatProtocol::writeOutput(uint8_t output, bool state)
 {
   if(m_modbusEnabled)
-  {
     m_modbusTcp.Coil(output, state);
-  }
 
   if(m_mqttEnabled)
   {
@@ -339,19 +327,13 @@ enumProtocolBlindsState housecatProtocol::readBlind(uint8_t output)
   if(m_modbusEnabled)
   {
     if(m_modbusTcp.Coil(output))
-    {
       return blind_down;
-    }
     else
-    {
       return blind_up;
-    }
   }
 
   if(m_mqttEnabled)
-  {
     return static_cast<enumProtocolBlindsState>(m_mqttOutputs[output]);
-  }
 
   return static_cast<enumProtocolBlindsState>(0);
 }
@@ -418,7 +400,7 @@ bool housecatProtocol::addDimmer(uint8_t dimmer)
 
   if(m_modbusEnabled)
   {
-    ret = m_modbusTcp.addCoil(m_digital_outputs + 1 + dimmer);
+    ret = m_modbusTcp.addCoil(m_digital_outputs + 1 + dimmer); //outputs start from 1
     ret &= m_modbusTcp.addHreg(dimmer);
   }
 
@@ -428,14 +410,10 @@ bool housecatProtocol::addDimmer(uint8_t dimmer)
 bool housecatProtocol::readDimmerState(uint8_t dimmer)
 {
   if(m_modbusEnabled)
-  {
     return (bool) (m_modbusTcp.Coil(m_digital_outputs + 1 + dimmer) & 0x01);
-  }
 
   if(m_mqttEnabled)
-  {
     return m_mqttDimmerStates[dimmer];
-  }
 
   return false;
 }
@@ -443,9 +421,7 @@ bool housecatProtocol::readDimmerState(uint8_t dimmer)
 void housecatProtocol::writeDimmerState(uint8_t dimmer, bool state)
 {
   if(m_modbusEnabled)
-  {
     m_modbusTcp.Coil(m_digital_outputs + 1 + dimmer, state);
-  }
 
   if(m_mqttEnabled)
   {
@@ -459,14 +435,10 @@ void housecatProtocol::writeDimmerState(uint8_t dimmer, bool state)
 uint8_t housecatProtocol::readDimmerValue(uint8_t dimmer)
 {
   if(m_modbusEnabled)
-  {
     return (m_modbusTcp.Hreg(dimmer) & 0xFF);
-  }
 
   if(m_mqttEnabled)
-  {
     return m_mqttDimmerValues[dimmer];
-  }
 
   return 0;
 }
@@ -474,9 +446,7 @@ uint8_t housecatProtocol::readDimmerValue(uint8_t dimmer)
 void housecatProtocol::writeDimmerValue(uint8_t dimmer, uint8_t value)
 {
   if(m_modbusEnabled)
-  {
     m_modbusTcp.Hreg(dimmer, value);
-  }
 
   if(m_mqttEnabled)
   {
@@ -501,9 +471,7 @@ void housecatProtocol::poll()
     m_mqttClient.loop();
 
     if (!m_mqttClient.connected()) 
-    {
       mqttConnect();
-    }
   }
 
   if(m_mqttCallback)
@@ -520,25 +488,15 @@ void housecatProtocol::poll()
     if((0 < output_number) && (output_number < sizeof(m_mqttOutputs)))
     {
       if(m_mqttReceivedPayload == "TRUE")
-      {
         m_mqttOutputs[output_number] = true;
-      }
       else if(m_mqttReceivedPayload == "FALSE")
-      {
         m_mqttOutputs[output_number] = false;
-      }
       else if(m_mqttReceivedPayload == "STOP")
-      {
         m_mqttOutputs[output_number] = blind_stop;
-      }
       else if(m_mqttReceivedPayload == "UP")
-      {
         m_mqttOutputs[output_number] = blind_up;
-      }
       else if(m_mqttReceivedPayload == "DOWN")
-      {
         m_mqttOutputs[output_number] = blind_down;
-      }
     }
   }
   else if(m_mqttReceivedTopic.startsWith(m_mqttDimmersTopic))
@@ -551,13 +509,9 @@ void housecatProtocol::poll()
       if((0 < dimmer_number) && (dimmer_number < sizeof(m_mqttDimmerStates)))
       {
         if(m_mqttReceivedPayload == "TRUE")
-        {
           m_mqttDimmerStates[dimmer_number] = true;
-        }
         else if(m_mqttReceivedPayload == "FALSE")
-        {
           m_mqttDimmerStates[dimmer_number] = false;
-        }
       }
     }
     else if(m_mqttReceivedTopic.endsWith(m_mqttDimmersValueSubTopic))
@@ -568,9 +522,7 @@ void housecatProtocol::poll()
       {
         uint8_t dimmer_value = m_mqttReceivedPayload.toInt();
         if((dimmer_value > 0) && (dimmer_value <= 100))
-        {
           m_mqttDimmerValues[dimmer_number] = dimmer_value;
-        }
       }
     }
   }

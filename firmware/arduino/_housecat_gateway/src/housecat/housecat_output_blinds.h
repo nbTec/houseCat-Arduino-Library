@@ -24,7 +24,7 @@ class housecatOutputBlinds
     bool m_firstPoll = true;
 	
     bool m_upInputPrv = false;
-	  bool m_downInputPrv = false;
+	bool m_downInputPrv = false;
 
     unsigned long m_prvTimeMs = 0;
     unsigned long m_prvTimeSec = 0;

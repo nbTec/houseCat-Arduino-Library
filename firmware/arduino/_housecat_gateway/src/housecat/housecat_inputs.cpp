@@ -79,7 +79,6 @@ housecatInputs::housecatInputs(housecatProtocol &protocol): m_protocol(protocol)
   m_mapping[3][13] = 28;
   m_mapping[3][14] = 61;
   m_mapping[3][15] = 29;
-
 }
 
 void housecatInputs::init()

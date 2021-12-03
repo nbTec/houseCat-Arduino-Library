@@ -79,6 +79,7 @@ class housecatProtocol
     void modbusEnable();
 
     void mqttEnable();
+    bool modbusEnabled();
     void mqttSetBroker(IPAddress brokerIp, int brokerPort);
     void mqttSetBrokerCredentials(String username);
     void mqttSetBrokerCredentials(String username, String password);

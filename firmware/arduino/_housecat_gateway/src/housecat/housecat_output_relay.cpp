@@ -103,7 +103,23 @@ void housecatOutputRelay::poll(bool toggleInput, bool resetInput)
   poll(toggleInput);
 }
 
-void housecatOutputRelay::poll(bool toggleInput, bool resetInput, bool motionInput)
+void housecatOutputRelay::poll(bool toggleInput, bool resetInput, bool panicInput)
+{
+  uint8_t panic_pressed = panicInput && (!m_panicInputPrv);
+
+  if(panic_pressed)
+  {
+    m_outputState = true;
+    g_housecat_outputs.write(m_outputNumber, m_outputState);
+    g_housecat_protocol.writeOutput(m_outputNumber, m_outputState);
+  }
+  
+  m_panicInputPrv = panicInput;
+
+  poll(toggleInput, resetInput);
+}
+
+void housecatOutputRelay::poll(bool toggleInput, bool resetInput, bool panicInput, bool motionInput)
 {
   uint8_t motion_pulse = motionInput && (!m_motionInputPrv);
 
@@ -129,21 +145,5 @@ void housecatOutputRelay::poll(bool toggleInput, bool resetInput, bool motionInp
   
   m_motionInputPrv = motionInput;
 
-  poll(toggleInput, resetInput);
-}
-
-void housecatOutputRelay::poll(bool toggleInput, bool resetInput, bool motionInput, bool panicInput)
-{
-  uint8_t panic_pressed = panicInput && (!m_panicInputPrv);
-
-  if(panic_pressed)
-  {
-    m_outputState = true;
-    g_housecat_outputs.write(m_outputNumber, m_outputState);
-    g_housecat_protocol.writeOutput(m_outputNumber, m_outputState);
-  }
-  
-  m_panicInputPrv = panicInput;
-
-  poll(toggleInput, resetInput, motionInput);
+  poll(toggleInput, resetInput, panicInput);
 }

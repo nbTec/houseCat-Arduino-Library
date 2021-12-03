@@ -26,7 +26,7 @@ housecatOutputRelay lightHallway(2);
 
 //Blinds declaration (add poll to outputPolling function below)
 //housecatOutputBlinds blind_name(on_off_output_number, up_down_output_number, travel_time_seconds);
-housecatOutputBlinds blindLivingRoom_1(3, 4, 30);
+housecatOutputBlinds blindLivingRoom_1(17, 18, 15);
 
 
 //Analog output dimmers declaration for 0-10V outputs (add poll to outputPolling function below)
@@ -36,15 +36,13 @@ housecatAnalogOutputDimmer dimmerLivingroom(1, 10, 70);
 
 void setup()
 {
-  hc.init();
-
   //Enable one of the following three protocols by uncommenting them (only one can be used at the moment)
 
   g_housecat_protocol.modbusEnable();
 
   //g_housecat_protocol.mqttEnable();
   //g_housecat_protocol.mqttSetBroker(IPAddress(192, 168, 1, 101), 1883);
-  //g_housecat_protocol.mqttSetBrokerCredentials("user", "password");
+  //g_housecat_protocol.mqttSetBrokerCredentials("nickb", "thunderboltp47d");
 
   //g_housecat_protocol.udpEnable();
   //g_housecat_protocol.udpSetAddress(1);
@@ -54,6 +52,8 @@ void setup()
   //Optional tests
   //hc.onewireTest();
   //hc.analogOutputsTest();
+
+  hc.init();
 
   //Output additional settings
   lightHallway.enableAutoOff(30);

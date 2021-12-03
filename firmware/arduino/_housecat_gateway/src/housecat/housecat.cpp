@@ -101,6 +101,8 @@ void housecat::heartbeatLed()
 
 void housecat::init()
 {
+  ethernetInit();
+  
   pinMode(LED_PIN, OUTPUT);
   pinMode(UART1_RTS_PIN, OUTPUT);
   pinMode(UART2_RTS_PIN, OUTPUT);
@@ -122,8 +124,6 @@ void housecat::init()
   g_housecat_inputs.init();
   g_housecat_outputs.init();
   g_housecat_analog_outputs.init();
-
-  ethernetInit();
 
   Serial.println("Housecat Started");
 }
