@@ -42,7 +42,7 @@ void setup()
 
   //g_housecat_protocol.mqttEnable();
   //g_housecat_protocol.mqttSetBroker(IPAddress(192, 168, 1, 101), 1883);
-  //g_housecat_protocol.mqttSetBrokerCredentials("nickb", "thunderboltp47d");
+  //g_housecat_protocol.mqttSetBrokerCredentials("user", "password");
 
   //g_housecat_protocol.udpEnable();
   //g_housecat_protocol.udpSetAddress(1);
