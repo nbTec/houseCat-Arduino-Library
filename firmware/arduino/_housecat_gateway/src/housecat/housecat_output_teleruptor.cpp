@@ -81,6 +81,7 @@ void housecatOutputTeleruptor::poll(bool toggleInput)
   {
     m_outputState = !m_outputState;
     g_housecat_protocol.writeOutput(m_outputNumber, m_outputState);
+    m_motionActive = false;
     m_autoOffStartTime = readTimeSec();
   }
 
@@ -88,6 +89,7 @@ void housecatOutputTeleruptor::poll(bool toggleInput)
   if(protocol_state != m_outputState)
   {
     m_outputState = protocol_state;
+    m_motionActive = false;
     m_autoOffStartTime = readTimeSec();
   }
 
@@ -128,6 +130,7 @@ void housecatOutputTeleruptor::poll(bool toggleInput, bool resetInput, bool pani
   {
     m_outputState = true;
     g_housecat_protocol.writeOutput(m_outputNumber, m_outputState);
+    m_motionActive = false;
   }
   
   m_panicInputPrv = panicInput;

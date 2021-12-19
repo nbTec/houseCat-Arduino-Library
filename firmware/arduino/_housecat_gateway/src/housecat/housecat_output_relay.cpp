@@ -63,6 +63,7 @@ void housecatOutputRelay::poll(bool toggleInput)
     m_outputState = !m_outputState;
     g_housecat_outputs.write(m_outputNumber, m_outputState);
     g_housecat_protocol.writeOutput(m_outputNumber, m_outputState);
+    m_motionActive = false;
     m_autoOffStartTime = readTimeSec();
   }
 
@@ -71,6 +72,7 @@ void housecatOutputRelay::poll(bool toggleInput)
   {
     m_outputState = protocol_state;
     g_housecat_outputs.write(m_outputNumber, m_outputState);
+    m_motionActive = false;
     m_autoOffStartTime = readTimeSec();
   }
 
@@ -112,6 +114,7 @@ void housecatOutputRelay::poll(bool toggleInput, bool resetInput, bool panicInpu
     m_outputState = true;
     g_housecat_outputs.write(m_outputNumber, m_outputState);
     g_housecat_protocol.writeOutput(m_outputNumber, m_outputState);
+    m_motionActive = false;
   }
   
   m_panicInputPrv = panicInput;
