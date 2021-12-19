@@ -55,6 +55,9 @@ void housecatInputSensor::poll()
       {
         if (input_state)
         {
+          if(m_debug)
+            Serial.println((String) "Input sensor: " + m_inputNumber + " - pulse");
+
           m_pulse = true;
           g_housecat_protocol.writeInputSensor(m_inputNumber, true);
           m_inputState = falling_edge;

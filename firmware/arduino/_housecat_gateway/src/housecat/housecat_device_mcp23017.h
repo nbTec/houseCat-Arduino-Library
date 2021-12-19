@@ -42,6 +42,9 @@ public:
   void disableInterruptPin(uint8_t pin);
   uint8_t getLastInterruptPin();
   uint8_t getLastInterruptPinValue();
+  uint16_t getLastInterruptPins();
+  uint16_t getLastInterruptPinValues();
+  
 
 private:
   uint8_t i2caddr;

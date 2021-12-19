@@ -7,8 +7,9 @@
 class housecatInputSensor
 {
   private:
+    static const bool m_debug = true;
     
-    static const uint16_t m_holdOffTimeMs     = 50;
+    static const uint16_t m_holdOffTimeMs = 50;
 
     uint8_t m_inputNumber;
     bool m_activeState = true;

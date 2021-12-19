@@ -149,9 +149,7 @@ void housecatOutputs::poll()
       uint8_t output_raw_state = m_protocol.readOutputRaw(i);
 
       if(read(i) != output_raw_state)
-      {
         write(i, output_raw_state);
-      }
     }
   }
 }

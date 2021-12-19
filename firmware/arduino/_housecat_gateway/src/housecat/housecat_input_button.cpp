@@ -59,6 +59,9 @@ void housecatInputButton::poll()
       {
         if ((readTimeMs() - m_timerPrv) <= m_longPressTimeMs)
         {
+          if(m_debug)
+            Serial.println((String) "Input button: " + m_inputNumber + " - shortPress");
+
           m_shortPress = true;
           g_housecat_protocol.writeInputButtonShort(m_inputNumber, true);
           m_timerPrv = readTimeMs();
@@ -69,6 +72,9 @@ void housecatInputButton::poll()
       {
         if ((readTimeMs() - m_timerPrv) > m_longPressTimeMs)
         {
+          if(m_debug)
+          Serial.println((String) "Input button: " + m_inputNumber + " - longPress");
+
           m_longPress = true;
           g_housecat_protocol.writeInputButtonLong(m_inputNumber, true);
           m_inputState = long_press_wait;

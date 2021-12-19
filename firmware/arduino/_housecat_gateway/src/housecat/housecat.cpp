@@ -134,6 +134,7 @@ void housecat::poll()
     inputHandler();
 
     g_housecat_protocol.poll();
+	g_housecat_inputs.poll();
     g_housecat_outputs.poll();
     g_housecat_analog_outputs.poll();
 }

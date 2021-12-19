@@ -13,6 +13,7 @@ housecatInputButton buttonBlind_1_Up(5);
 housecatInputButton buttonBlind_1_Down(6);
 housecatInputButton buttonAllOff(7);
 housecatInputButton buttonPanic(8);
+housecatInputButton buttonTest(24);
 
 //Input sensor declaration (add poll to inputPolling function below)
 //housecatInputSensor sensor_name(input_number, active_state);
@@ -23,10 +24,11 @@ housecatInputSensor motionSensorHallway(9, LOW);
 //housecatOutputRelay relay_name(output_number);
 housecatOutputRelay lightLivingRoom(1);
 housecatOutputRelay lightHallway(2);
+housecatOutputRelay lightTest(17);
 
 //Blinds declaration (add poll to outputPolling function below)
 //housecatOutputBlinds blind_name(on_off_output_number, up_down_output_number, travel_time_seconds);
-housecatOutputBlinds blindLivingRoom_1(17, 18, 15);
+housecatOutputBlinds blindLivingRoom_1(18, 19, 15);
 
 
 //Analog output dimmers declaration for 0-10V outputs (add poll to outputPolling function below)
@@ -54,6 +56,7 @@ void setup()
   //hc.analogOutputsTest();
 
   hc.init();
+  hc.scanI2c();
 
   //Output additional settings
   lightHallway.enableAutoOff(30);
@@ -84,6 +87,7 @@ void inputPolling()
   buttonBlind_1_Down.poll();
   buttonAllOff.poll();
   buttonPanic.poll();
+  buttonTest.poll();
 
   motionSensorHallway.poll();
 }
@@ -94,6 +98,7 @@ void outputPolling()
   //relay_name(toggle_input, reset_input, panic_input, motion_input)
   lightLivingRoom.poll    (buttonLivingroom_1.shortPress());
   lightHallway.poll       (buttonHallway_1.shortPress() or buttonHallway_2.shortPress(), buttonAllOff.longPress(), buttonPanic.longPress(), motionSensorHallway.pulse());
+  lightTest.poll          (buttonTest.shortPress());
 
   //blind_name.poll(up_input, down_input)
   blindLivingRoom_1.poll  (buttonBlind_1_Up.shortPress(), buttonBlind_1_Down.shortPress());

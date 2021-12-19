@@ -81,13 +81,18 @@ housecatInputs::housecatInputs(housecatProtocol &protocol): m_protocol(protocol)
   m_mapping[3][15] = 29;
 }
 
+unsigned long housecatInputs::readTimeMs()
+{
+  return millis();
+}
+
 void housecatInputs::init()
 {
-  for (int i = 0; i < m_ioExpanderQuantity; i++)
+  for(int i = 0; i < m_ioExpanderQuantity; i++)
   {
     m_ioExpander[i].begin(i + m_i2cBaseAddress);
     m_ioExpander[i].setupInterrupts(true, true, LOW);
-    for (int j = 0; j < m_ioExpanderPins; j++)
+    for(int j = 0; j < m_ioExpanderPins; j++)
     {
       m_ioExpander[i].pinMode(j, INPUT);
       m_ioExpander[i].setupInterruptPin(j, CHANGE);
@@ -95,6 +100,38 @@ void housecatInputs::init()
   }
 }
 
+void housecatInputs::interruptCallback()
+{
+  uint16_t interrupt_pins, values, value;
+  for(int i = 0; i < m_ioExpanderQuantity; i++)
+  {
+    interrupt_pins = m_ioExpander[i].getLastInterruptPins();
+    if(interrupt_pins)
+    {
+      values = m_ioExpander[i].getLastInterruptPinValues();
+
+      for(int j = 0; j < 16; j++)
+      {
+        if((interrupt_pins >> j) & 0x01)
+        {
+          value = ((values >> j) & 0x01);
+          m_input[m_mapping[i][j]] = value;
+          m_protocol.writeInputRaw(m_mapping[i][j] + 1, (bool) m_input[m_mapping[i][j]]);
+
+          if(value && m_debug)
+          {
+            Serial.print("Input: ");
+            Serial.println(m_mapping[i][j] + 1);
+          }
+        }
+      }
+    }
+  }
+  
+  m_pollTimerPrv = readTimeMs();
+}
+
+/*
 void housecatInputs::interruptCallback()
 {
   uint8_t interrupt_pin, value;
@@ -108,16 +145,34 @@ void housecatInputs::interruptCallback()
 
       m_protocol.writeInputRaw(m_mapping[i][interrupt_pin] + 1, (bool) value);
 
-      /*Serial.print("IO Expander: ");
-      Serial.print(i);*/
-      if(value)
+      if(value && m_debug)
       {
         Serial.print("Input: ");
         Serial.println(m_mapping[i][interrupt_pin] + 1);
-        //Serial.print(", Value: ");
-        //Serial.println(value);
       }
     }
+  }
+}
+*/
+
+void housecatInputs::poll()
+{
+  uint16_t values, value;
+  
+  if((readTimeMs() - m_pollTimerPrv) > m_pollTimeMs)
+  {
+	for(int i = 0; i < m_ioExpanderQuantity; i++)
+	{
+	  values = m_ioExpander[i].readGPIOAB();
+
+	  for(int j = 0; j < 16; j++)
+	  {
+		value = ((values >> j) & 0x01);
+		m_input[m_mapping[i][j]] = value;
+		m_protocol.writeInputRaw(m_mapping[i][j] + 1, (bool) m_input[m_mapping[i][j]]);
+	  }
+	}
+	m_pollTimerPrv = readTimeMs();
   }
 }
 

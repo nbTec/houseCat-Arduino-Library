@@ -393,3 +393,19 @@ uint8_t housecatDeviceMcp23017::getLastInterruptPinValue() {
 
   return MCP23017_INT_ERR;
 }
+
+
+/*!
+ * @brief Gets the last interrupt pins
+ * @return Returns the last interrupt pins
+ */
+uint16_t housecatDeviceMcp23017::getLastInterruptPins() {
+  return (readRegister(MCP23017_INTFB) << 8) | readRegister(MCP23017_INTFA);
+}
+/*!
+ * @brief Gets the values of the last interrupt pins
+ * @return Returns the values of the last interrupt pins
+ */
+uint16_t housecatDeviceMcp23017::getLastInterruptPinValues() {
+  return (readRegister(MCP23017_INTCAPB) << 8) | readRegister(MCP23017_INTCAPA);
+}

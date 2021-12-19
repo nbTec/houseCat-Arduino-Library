@@ -125,7 +125,7 @@ void housecatOutputRelay::poll(bool toggleInput, bool resetInput, bool panicInpu
 
   if(m_motion)
   {
-    if(motion_pulse)
+    if(motion_pulse && (m_outputState == false))
     {
       m_motionActive = true;
       m_outputState = true;

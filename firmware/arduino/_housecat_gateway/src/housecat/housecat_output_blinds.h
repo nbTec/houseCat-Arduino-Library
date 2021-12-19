@@ -19,7 +19,7 @@ class housecatOutputBlinds
 	
 	enum enumBlindsState {stop, paused, start_down, going_down, closed, switch_direction_down_to_up,
                            start_up, going_up, open, switch_direction_up_to_down};
-	enumBlindsState m_blindsState = open;
+	enumBlindsState m_blindsState = stop;
 
     bool m_firstPoll = true;
 	
