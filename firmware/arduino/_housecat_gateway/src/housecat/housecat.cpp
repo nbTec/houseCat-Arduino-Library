@@ -23,15 +23,14 @@ void IRAM_ATTR housecatInputsInterruptCallback()
 void housecatNetworkEvent(WiFiEvent_t event)
 {
   switch (event) {
-    case SYSTEM_EVENT_ETH_START:
+    case ARDUINO_EVENT_ETH_START:
       Serial.println("ETH Started");
-      //set eth hostname here
       ETH.setHostname(housecat_hostname);
       break;
-    case SYSTEM_EVENT_ETH_CONNECTED:
+    case ARDUINO_EVENT_ETH_CONNECTED:
       Serial.println("ETH Connected");
       break;
-    case SYSTEM_EVENT_ETH_GOT_IP:
+    case ARDUINO_EVENT_ETH_GOT_IP:
       Serial.print("ETH MAC: ");
       Serial.print(ETH.macAddress());
       Serial.print(", IPv4: ");
@@ -43,10 +42,10 @@ void housecatNetworkEvent(WiFiEvent_t event)
       Serial.print(ETH.linkSpeed());
       Serial.println("Mbps");
       break;
-    case SYSTEM_EVENT_ETH_DISCONNECTED:
+    case ARDUINO_EVENT_ETH_DISCONNECTED:
       Serial.println("ETH Disconnected");
       break;
-    case SYSTEM_EVENT_ETH_STOP:
+    case ARDUINO_EVENT_ETH_STOP:
       Serial.println("ETH Stopped");
       break;
     default:
@@ -70,6 +69,7 @@ void housecat::ethernetInit()
   
   WiFi.onEvent(housecatNetworkEvent);
   ETH.begin();
+  //ETH.begin(ETH_PHY_ADDR, ETH_PHY_POWER, ETH_PHY_MDC, ETH_PHY_MDIO, ETH_PHY_LAN87XX, ETH_CLOCK_GPIO0_IN);
 }
 
 void housecat::inputInterruptInit()
@@ -101,6 +101,8 @@ void housecat::heartbeatLed()
 
 void housecat::init()
 {
+  Serial.begin(115200);
+  
   ethernetInit();
   
   pinMode(LED_PIN, OUTPUT);
@@ -110,11 +112,10 @@ void housecat::init()
 
   digitalWrite(UART1_RTS_PIN, HIGH);
 
-  Serial.begin(115200);
   hcSerial1.begin(9600, SERIAL_8N1, UART1_RX_PIN, UART1_TX_PIN);
   hcSerial2.begin(9600, SERIAL_8N1, UART2_RX_PIN, UART2_TX_PIN);
 
-  Wire.begin(I2C_SDA_PIN, I2C_SCL_PIN, 400000);
+  Wire.begin((int) I2C_SDA_PIN, (int) I2C_SCL_PIN, (uint32_t) 400000);
 
   inputInterruptInit();
 
@@ -174,7 +175,7 @@ void housecat::scanI2c()
 {
   byte error, address;
   int nDevices;
-  Serial.println("Scanning...");
+  Serial.println("I2C Scan...");
   nDevices = 0;
   for (address = 1; address < 127; address++ ) {
     Wire.beginTransmission(address);

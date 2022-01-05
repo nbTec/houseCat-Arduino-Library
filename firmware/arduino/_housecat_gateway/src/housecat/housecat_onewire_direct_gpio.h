@@ -158,12 +158,12 @@ void directModeInput(IO_REG_TYPE pin)
 {
     if ( digitalPinIsValid(pin) )
     {
-        uint32_t rtc_reg(rtc_gpio_desc[pin].reg);
+        uint32_t rtc_reg(rtc_io_desc[pin].reg);
 
         if ( rtc_reg ) // RTC pins PULL settings
         {
-            ESP_REG(rtc_reg) = ESP_REG(rtc_reg) & ~(rtc_gpio_desc[pin].mux);
-            ESP_REG(rtc_reg) = ESP_REG(rtc_reg) & ~(rtc_gpio_desc[pin].pullup | rtc_gpio_desc[pin].pulldown);
+            ESP_REG(rtc_reg) = ESP_REG(rtc_reg) & ~(rtc_io_desc[pin].mux);
+            ESP_REG(rtc_reg) = ESP_REG(rtc_reg) & ~(rtc_io_desc[pin].pullup | rtc_io_desc[pin].pulldown);
         }
 
         if ( pin < 32 )
@@ -186,12 +186,12 @@ void directModeOutput(IO_REG_TYPE pin)
 {
     if ( digitalPinIsValid(pin) && pin <= 33 ) // pins above 33 can be only inputs
     {
-        uint32_t rtc_reg(rtc_gpio_desc[pin].reg);
+        uint32_t rtc_reg(rtc_io_desc[pin].reg);
 
         if ( rtc_reg ) // RTC pins PULL settings
         {
-            ESP_REG(rtc_reg) = ESP_REG(rtc_reg) & ~(rtc_gpio_desc[pin].mux);
-            ESP_REG(rtc_reg) = ESP_REG(rtc_reg) & ~(rtc_gpio_desc[pin].pullup | rtc_gpio_desc[pin].pulldown);
+            ESP_REG(rtc_reg) = ESP_REG(rtc_reg) & ~(rtc_io_desc[pin].mux);
+            ESP_REG(rtc_reg) = ESP_REG(rtc_reg) & ~(rtc_io_desc[pin].pullup | rtc_io_desc[pin].pulldown);
         }
 
         if ( pin < 32 )
