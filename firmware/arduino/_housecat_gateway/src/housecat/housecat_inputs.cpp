@@ -110,69 +110,44 @@ void housecatInputs::interruptCallback()
     {
       values = m_ioExpander[i].getLastInterruptPinValues();
 
-      for(int j = 0; j < 16; j++)
+      for(int j = 0; j < m_ioExpanderPins; j++)
       {
         if((interrupt_pins >> j) & 0x01)
         {
           value = ((values >> j) & 0x01);
           m_input[m_mapping[i][j]] = value;
-          m_protocol.writeInputRaw(m_mapping[i][j] + 1, (bool) m_input[m_mapping[i][j]]);
+          protocolWrite(m_mapping[i][j] + 1, value);
 
           if(value && m_debug)
           {
-            Serial.print("Input: ");
+            Serial.print("Raw input: ");
             Serial.println(m_mapping[i][j] + 1);
           }
         }
       }
     }
   }
-  
   m_pollTimerPrv = readTimeMs();
 }
-
-/*
-void housecatInputs::interruptCallback()
-{
-  uint8_t interrupt_pin, value;
-  for (int i = 0; i < m_ioExpanderQuantity; i++)
-  {
-    interrupt_pin = m_ioExpander[i].getLastInterruptPin();
-    if (interrupt_pin != MCP23017_INT_ERR)
-    {
-      value = m_ioExpander[i].getLastInterruptPinValue();
-      m_input[m_mapping[i][interrupt_pin]] = value;
-
-      m_protocol.writeInputRaw(m_mapping[i][interrupt_pin] + 1, (bool) value);
-
-      if(value && m_debug)
-      {
-        Serial.print("Input: ");
-        Serial.println(m_mapping[i][interrupt_pin] + 1);
-      }
-    }
-  }
-}
-*/
 
 void housecatInputs::poll()
 {
   uint16_t values, value;
-  
+
   if((readTimeMs() - m_pollTimerPrv) > m_pollTimeMs)
   {
-	for(int i = 0; i < m_ioExpanderQuantity; i++)
-	{
-	  values = m_ioExpander[i].readGPIOAB();
+    for(int i = 0; i < m_ioExpanderQuantity; i++)
+    {
+      values = m_ioExpander[i].readGPIOAB();
 
-	  for(int j = 0; j < 16; j++)
-	  {
-		value = ((values >> j) & 0x01);
-		m_input[m_mapping[i][j]] = value;
-		m_protocol.writeInputRaw(m_mapping[i][j] + 1, (bool) m_input[m_mapping[i][j]]);
-	  }
-	}
-	m_pollTimerPrv = readTimeMs();
+      for(int j = 0; j < m_ioExpanderPins; j++)
+      {
+        value = ((values >> j) & 0x01);
+        m_input[m_mapping[i][j]] = value;
+        protocolWrite(m_mapping[i][j] + 1, value);
+      }
+    }
+    m_pollTimerPrv = readTimeMs();
   }
 }
 
@@ -182,4 +157,21 @@ bool housecatInputs::read(uint8_t input)
     return m_input[input - 1];
   else
     return false;
+}
+
+void housecatInputs::protocolWrite(uint8_t input, bool value)
+{
+  //Input must be high for two consecutive polls in order to pass to protocol, filters glitches smaller then 20ms
+  uint8_t zero_based_input = input - 1;
+  if(value && m_input_protocol_value_prv[zero_based_input] && !m_input_protocol[zero_based_input])
+  {
+    m_protocol.writeInputRaw(input, true);
+    m_input_protocol[zero_based_input] = true;
+  }
+  else if(!value && m_input_protocol[zero_based_input])
+  {
+    m_protocol.writeInputRaw(input, false);
+    m_input_protocol[zero_based_input] = false;
+  }
+  m_input_protocol_value_prv[zero_based_input] = value;
 }

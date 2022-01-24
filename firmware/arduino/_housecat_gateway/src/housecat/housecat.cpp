@@ -126,18 +126,18 @@ void housecat::init()
   g_housecat_outputs.init();
   g_housecat_analog_outputs.init();
 
-  Serial.println("Housecat Started");
+  Serial.println("Housecat: Started");
 }
 
 void housecat::poll()
 {
-    heartbeatLed();
-    inputHandler();
+  heartbeatLed();
+  inputHandler();
 
-    g_housecat_protocol.poll();
+  g_housecat_protocol.poll();
 	g_housecat_inputs.poll();
-    g_housecat_outputs.poll();
-    g_housecat_analog_outputs.poll();
+  g_housecat_outputs.poll();
+  g_housecat_analog_outputs.poll();
 }
 
 void housecat::outputsTest()

@@ -11,6 +11,8 @@ enum enumProtocolBlindsState {blind_stop = 0, blind_up = 1, blind_down = 2, blin
 class housecatProtocol
 {
   private:
+    static const bool m_debug = false;
+
     bool m_modbusEnabled = false;
     bool m_mqttEnabled = false;
     bool m_udpEnabled = false;
@@ -18,7 +20,6 @@ class housecatProtocol
     bool m_connected = false;
 
     ModbusIP m_modbusTcp;
-
 
     WiFiClient m_wifiClient;
     MQTTClient m_mqttClient;
@@ -46,13 +47,12 @@ class housecatProtocol
     static const uint8_t m_digital_inputs = 64;
     static const uint8_t m_digital_outputs = 64;
     static const uint8_t m_analog_outputs = 8;
-    
+
     bool m_mqttInputsShort[m_digital_inputs + 1];
     bool m_mqttInputsLong[sizeof(m_mqttInputsShort)];
     uint8_t m_mqttOutputs[m_digital_outputs + 1];
     uint8_t m_mqttDimmerStates[m_analog_outputs + 1];
     uint8_t m_mqttDimmerValues[sizeof(m_mqttDimmerStates)];
-
 
     WiFiUDP m_udpSend;
     WiFiUDP m_udpReceive;
@@ -71,7 +71,6 @@ class housecatProtocol
     String m_udpAnalogOutputString;
     bool m_udpOutputs[m_digital_outputs + 1];
     uint8_t m_udpAnalogOutputs[m_analog_outputs + 1];
-
 
   public:
     housecatProtocol();

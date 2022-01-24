@@ -88,23 +88,25 @@ void housecatProtocol::mqttSetBrokerCredentials(String username, String password
 void housecatProtocol::init()
 {
   if(m_modbusEnabled)
+  {
     m_modbusTcp.server();
-  
-  if(m_mqttEnabled)
+    Serial.println("Modbus: Started");
+  }
+  else if(m_mqttEnabled)
   {
     m_mqttClient.begin(m_mqttBrokerIpAddress, m_mqttBrokerPort, m_wifiClient);
     m_mqttClient.onMessage(mqttCallback);
     mqttConnect();
+    Serial.println("MQTT: Started");
   }
-
-  if(m_udpEnabled)
+  else if(m_udpEnabled)
   {
     m_udpDigitalInputString =  m_udpDeviceName + String(m_udpDeviceAddress) + m_udpSeparator + m_udpDigitalInputPrefix;
     m_udpDigitalOutputString =  m_udpDeviceName + String(m_udpDeviceAddress) + m_udpSeparator + m_udpDigitalOutputPrefix;
     m_udpAnalogOutputString =  m_udpDeviceName + String(m_udpDeviceAddress) + m_udpSeparator + m_udpAnalogOutputPrefix;
-
     m_udpSend.begin(m_udpSendPort);
     m_udpReceive.begin(m_udpReceivePort);
+    Serial.println("UDP: Started");
   }
 }
 
@@ -125,11 +127,9 @@ void housecatProtocol::mqttConnect()
   else
     m_mqttClient.connect(mqtt_client_id, mqtt_username, mqtt_password, false);
     
-  
   m_mqttClient.subscribe("/housecat/status");
-  m_mqttClient.publish("/housecat/status", "Hello");
+  m_mqttClient.publish("/housecat/status", "Housecat says hello");
 
-  
   for(int i = 1; i < sizeof(m_mqttOutputs); i++)
   {
     String output_number = String(i);
@@ -167,6 +167,14 @@ void housecatProtocol::writeInputRaw(uint8_t input, bool state)
     m_udpSend.beginPacket(m_udpSendIpAddress, m_udpSendPort);
     m_udpSend.write(buffer, string_length);
     m_udpSend.endPacket();
+
+    if(m_debug)
+    {
+      Serial.print("UDP: Digital input: ");
+      Serial.print(input);
+      Serial.print(" State: ");
+      Serial.println(state);
+    } 
   }
 }
 
@@ -340,7 +348,7 @@ enumProtocolBlindsState housecatProtocol::readBlind(uint8_t output)
 
 void housecatProtocol::writeBlind(uint8_t output, enumProtocolBlindsState state)
 {
-  if (m_modbusEnabled)
+  if(m_modbusEnabled)
   {
     switch(state)
     {
@@ -476,10 +484,13 @@ void housecatProtocol::poll()
 
   if(m_mqttCallback)
   { 
-  Serial.print("MQTT: ");
-  Serial.print(m_mqttReceivedTopic);
-  Serial.print(", ");
-  Serial.println(m_mqttReceivedPayload);
+    if(m_debug)
+    {
+      Serial.print("MQTT: ");
+      Serial.print(m_mqttReceivedTopic);
+      Serial.print(", ");
+      Serial.println(m_mqttReceivedPayload);
+    }
 
   if(m_mqttReceivedTopic.startsWith(m_mqttOutputsTopic))
   {
@@ -552,10 +563,15 @@ void housecatProtocol::poll()
         if((output_index < sizeof(m_udpOutputs)) && (output_state <= 1))
         {
           m_udpOutputs[output_index] = output_state;
-          /*Serial.print("UDP: Digital output: ");
-          Serial.print(output_index);
-          Serial.print(" State: ");
-          Serial.println(output_state);*/
+
+          if(m_debug)
+          {
+            Serial.print("UDP: Digital output: ");
+            Serial.print(output_index);
+            Serial.print(" State: ");
+            Serial.println(output_state);
+          }
+         
         }
       }
       else if(udp_string.startsWith(m_udpAnalogOutputString))
@@ -570,10 +586,14 @@ void housecatProtocol::poll()
         if(output_index < sizeof(m_udpAnalogOutputs))
         {
           m_udpAnalogOutputs[output_index] = output_state;
-          /*Serial.print("UDP: Analog output: ");
-          Serial.print(output_index);
-          Serial.print(" State: ");
-          Serial.println(output_state);*/
+
+          if(m_debug)
+          {
+            Serial.print("UDP: Analog output: ");
+            Serial.print(output_index);
+            Serial.print(" State: ");
+            Serial.println(output_state);
+          }
         }
       }
     }
