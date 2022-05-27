@@ -145,6 +145,12 @@ void housecatInputs::poll()
         value = ((values >> j) & 0x01);
         m_input[m_mapping[i][j]] = value;
         protocolWrite(m_mapping[i][j] + 1, value);
+
+        if(value && m_debug)
+        {
+          Serial.print("Raw input: ");
+          Serial.println(m_mapping[i][j] + 1);
+        }
       }
     }
     m_pollTimerPrv = readTimeMs();
