@@ -188,6 +188,8 @@ void housecatOutputBlinds::poll(bool upInput, bool downInput)
   
   m_upInputPrv = upInput;
   m_downInputPrv = downInput;
+
+  relayHandler();
 }
 
 unsigned long housecatOutputBlinds::readTimeMs()
@@ -202,18 +204,62 @@ unsigned long housecatOutputBlinds::readTimeSec()
 
 void housecatOutputBlinds::relaysStop()
 {
-	g_housecat_outputs.write(m_outputNumber_1, false);
-	g_housecat_outputs.write(m_outputNumber_2, false);
+	m_relayState = relays_stop;
 }
 
 void housecatOutputBlinds::relaysDown()
 {
-	g_housecat_outputs.write(m_outputNumber_1, true);
-	g_housecat_outputs.write(m_outputNumber_2, !m_invertDirection);
+	m_relayState = relays_down;
 }
 
 void housecatOutputBlinds::relaysUp()
 {
-	g_housecat_outputs.write(m_outputNumber_1, true);
-	g_housecat_outputs.write(m_outputNumber_2, m_invertDirection);
+	m_relayState = relays_up;
+}
+
+void housecatOutputBlinds::relayHandler()
+{
+	switch(m_relayState)
+	{
+		case relays_idle:
+			break;
+
+		case relays_stop:
+			g_housecat_outputs.write(m_outputNumber_1, false);
+			m_prvRelayTimeMs = readTimeMs();
+			m_relayState = relays_disable_direction;
+			break;
+
+		case relays_down:
+			g_housecat_outputs.write(m_outputNumber_2, !m_invertDirection);
+			m_prvRelayTimeMs = readTimeMs();
+			m_relayState = relays_enable_power;
+			break;
+
+		case relays_up:
+			g_housecat_outputs.write(m_outputNumber_2, m_invertDirection);
+			m_prvRelayTimeMs = readTimeMs();
+			m_relayState = relays_enable_power;
+			break;
+
+		case relays_disable_direction:
+			if((readTimeMs() - m_prvRelayTimeMs) >= m_interRelayDelayTimeMs)
+			{
+				g_housecat_outputs.write(m_outputNumber_2, false);
+				m_relayState = relays_idle;
+			}
+			break;
+
+		case relays_enable_power:
+			if((readTimeMs() - m_prvRelayTimeMs) >= m_interRelayDelayTimeMs)
+			{
+				g_housecat_outputs.write(m_outputNumber_1, true);
+				m_relayState = relays_idle;
+			}
+			break;
+
+		default:
+			m_relayState = relays_idle;
+			break;
+	}
 }

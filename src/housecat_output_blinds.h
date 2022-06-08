@@ -13,6 +13,7 @@ class housecatOutputBlinds
     uint8_t m_type = 0;
     uint16_t m_travelTimeSec = 30; //Travel time in seconds
     uint16_t m_switchDirectionTimeMs = 1000; //Time between a direction switch in milliseconds
+    uint16_t m_interRelayDelayTimeMs = 50; //Time between a direction switch in milliseconds
 	bool m_invertDirection = false;
 
     enumProtocolBlindsState m_protocolInternalState = blind_open;
@@ -21,11 +22,16 @@ class housecatOutputBlinds
                            start_up, going_up, open, switch_direction_up_to_down};
 	enumBlindsState m_blindsState = stop;
 
+    enum enumRelayState {relays_idle, relays_stop, relays_up, relays_down, relays_disable_direction, relays_enable_power};
+
+    enumRelayState m_relayState = relays_stop;
+
     bool m_firstPoll = true;
 	
     bool m_upInputPrv = false;
 	bool m_downInputPrv = false;
 
+    unsigned long m_prvRelayTimeMs = 0;
     unsigned long m_prvTimeMs = 0;
     unsigned long m_prvTimeSec = 0;
 
@@ -35,6 +41,7 @@ class housecatOutputBlinds
     void relaysStop();
     void relaysDown();
     void relaysUp();
+    void relayHandler();
 
   public:
     housecatOutputBlinds(uint8_t outputNumber_1, uint8_t outputNumber_2, uint16_t travelTimeSec);
