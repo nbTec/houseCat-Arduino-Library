@@ -10,7 +10,7 @@ housecatAnalogOutputs g_housecat_analog_outputs(g_housecat_protocol);
 HardwareSerial hcSerial1(1);
 HardwareSerial hcSerial2(2);
 
-housecatOneWire hcOneWire(ONEWIRE_PIN, ONEWIRE_SLEW_PIN);
+housecatOneWire hcOneWire(HOUSECAT_ONEWIRE_PIN, HOUSECAT_ONEWIRE_SLEW_PIN);
 
 static bool g_housecat_input_interrupt = false;
 
@@ -61,11 +61,11 @@ housecat::housecat()
 
 void housecat::ethernetInit()
 {
-  pinMode(ETH_ENABLE_PIN, OUTPUT);
+  pinMode(HOUSECAT_ETH_ENABLE_PIN, OUTPUT);
   
-  digitalWrite(ETH_ENABLE_PIN, LOW);
+  digitalWrite(HOUSECAT_ETH_ENABLE_PIN, LOW);
   delay(100);
-  digitalWrite(ETH_ENABLE_PIN, HIGH);
+  digitalWrite(HOUSECAT_ETH_ENABLE_PIN, HIGH);
   
   WiFi.onEvent(housecatNetworkEvent);
   ETH.begin();
@@ -74,13 +74,13 @@ void housecat::ethernetInit()
 
 void housecat::inputInterruptInit()
 {
-  pinMode(INPUT_INT_PIN, INPUT);
-  attachInterrupt(INPUT_INT_PIN, housecatInputsInterruptCallback, FALLING);
+  pinMode(HOUSECAT_INPUT_INT_PIN, INPUT);
+  attachInterrupt(HOUSECAT_INPUT_INT_PIN, housecatInputsInterruptCallback, FALLING);
 }
 
 void housecat::inputHandler()
 {
-  if (g_housecat_input_interrupt || (digitalRead(INPUT_INT_PIN) == LOW))
+  if (g_housecat_input_interrupt || (digitalRead(HOUSECAT_INPUT_INT_PIN) == LOW))
   {
     g_housecat_inputs.interruptCallback();
     g_housecat_input_interrupt = false;
@@ -94,9 +94,66 @@ void housecat::heartbeatLed()
   if ((millis() - timer) > 1000) //run every second;
   {
     timer = millis();
-    digitalWrite(LED_PIN, status_led);
+    digitalWrite(HOUSECAT_LED_PIN, status_led);
     status_led = !status_led;
   }
+}
+
+
+
+void housecat::mqttEnable()
+{
+	g_housecat_protocol.mqttEnable();
+}
+	
+void housecat::modbusEnable()
+{
+	g_housecat_protocol.modbusEnable();
+}
+	
+bool housecat::modbusEnabled()
+{
+	return g_housecat_protocol.modbusEnabled();
+}
+	
+void housecat::mqttSetBroker(IPAddress brokerIp, int brokerPort)
+{
+	g_housecat_protocol.mqttSetBroker(brokerIp, brokerPort);
+}
+	
+void housecat::mqttSetBrokerCredentials(String username)
+{
+	g_housecat_protocol.mqttSetBrokerCredentials(username);
+}
+	
+void housecat::mqttSetBrokerCredentials(String username, String password)
+{
+	g_housecat_protocol.mqttSetBrokerCredentials(username, password);
+}
+
+void housecat::udpEnable()
+{
+	g_housecat_protocol.udpEnable();
+}
+	
+bool housecat::udpEnabled()
+{
+	return g_housecat_protocol.udpEnabled();
+}
+	
+void housecat::udpSetAddress(int address)
+{
+	g_housecat_protocol.udpSetAddress(address);
+}
+	
+void housecat::udpSetReceiver(int receivePort)
+{
+	g_housecat_protocol.udpSetReceiver(receivePort);
+}
+
+void housecat::udpSetSender(IPAddress sendIp, int sendPort)
+{
+	g_housecat_protocol.udpSetSender(sendIp, sendPort);
 }
 
 void housecat::init()
@@ -105,17 +162,17 @@ void housecat::init()
   
   ethernetInit();
   
-  pinMode(LED_PIN, OUTPUT);
-  pinMode(UART1_RTS_PIN, OUTPUT);
-  pinMode(UART2_RTS_PIN, OUTPUT);
-  //pinMode(ONEWIRE_SLEW_PIN, OUTPUT);
+  pinMode(HOUSECAT_LED_PIN, OUTPUT);
+  pinMode(HOUSECAT_UART1_RTS_PIN, OUTPUT);
+  pinMode(HOUSECAT_UART2_RTS_PIN, OUTPUT);
+  //pinMode(HOUSECAT_ONEWIRE_SLEW_PIN, OUTPUT);
 
-  digitalWrite(UART1_RTS_PIN, HIGH);
+  digitalWrite(HOUSECAT_UART1_RTS_PIN, HIGH);
 
-  hcSerial1.begin(9600, SERIAL_8N1, UART1_RX_PIN, UART1_TX_PIN);
-  hcSerial2.begin(9600, SERIAL_8N1, UART2_RX_PIN, UART2_TX_PIN);
+  hcSerial1.begin(9600, SERIAL_8N1, HOUSECAT_UART1_RX_PIN, HOUSECAT_UART1_TX_PIN);
+  hcSerial2.begin(9600, SERIAL_8N1, HOUSECAT_UART2_RX_PIN, HOUSECAT_UART2_TX_PIN);
 
-  Wire.begin((int) I2C_SDA_PIN, (int) I2C_SCL_PIN, (uint32_t) 400000);
+  Wire.begin((int) HOUSECAT_I2C_SDA_PIN, (int) HOUSECAT_I2C_SCL_PIN, (uint32_t) 400000);
 
   inputInterruptInit();
 

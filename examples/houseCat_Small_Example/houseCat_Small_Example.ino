@@ -40,16 +40,16 @@ void setup()
 {
   //Enable one of the following three protocols by uncommenting them (only one can be used at the moment)
 
-  g_housecat_protocol.modbusEnable();
+  hc.modbusEnable();
 
-  //g_housecat_protocol.mqttEnable();
-  //g_housecat_protocol.mqttSetBroker(IPAddress(192, 168, 1, 101), 1883);
-  //g_housecat_protocol.mqttSetBrokerCredentials("user", "password");
+  //hc.mqttEnable();
+  //hc.mqttSetBroker(IPAddress(192, 168, 1, 101), 1883);
+  //hc.mqttSetBrokerCredentials("user", "password");
 
-  //g_housecat_protocol.udpEnable();
-  //g_housecat_protocol.udpSetAddress(1);
-  //g_housecat_protocol.udpSetReceiver(55555);
-  //g_housecat_protocol.udpSetSender(IPAddress(192, 168, 1, 101), 44444);
+  //hc.udpEnable();
+  //hc.udpSetAddress(1);
+  //hc.udpSetReceiver(55555);
+  //hc.udpSetSender(IPAddress(192, 168, 1, 101), 44444);
 
   hc.init();
 
@@ -65,7 +65,7 @@ void loop()
   hc.poll();
   
   //UDP is used to read/control the raw IO, so the internal IO linkage is disabled when using UDP
-  if (!g_housecat_protocol.udpEnabled())
+  if (!hc.udpEnabled())
   {
     inputPolling();
     outputPolling();

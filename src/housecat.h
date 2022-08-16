@@ -34,22 +34,22 @@ extern housecatOneWire hcOneWire;
 
 #define housecat_hostname  "housecat"
 
-#define ONEWIRE_SLEW_PIN  2
-#define ONEWIRE_PIN       5
-#define UART1_RTS_PIN     12
-#define UART1_TX_PIN      14
-#define UART2_TX_PIN      15
-#define UART2_RTS_PIN     32
-#define LED_PIN           33
-#define CHAIN_OUT_PIN     33
-#define CHAIN_IN_PIN      34
-#define I2C_SCL_PIN       4
-#define I2C_SDA_PIN       16
-#define INPUT_INT_PIN     35
-#define ETH_ENABLE_PIN    13
-//#define ETH_POWER_PIN   13
-#define UART2_RX_PIN      36
-#define UART1_RX_PIN      39
+#define HOUSECAT_ONEWIRE_SLEW_PIN  2
+#define HOUSECAT_ONEWIRE_PIN       5
+#define HOUSECAT_UART1_RTS_PIN     12
+#define HOUSECAT_UART1_TX_PIN      14
+#define HOUSECAT_UART2_TX_PIN      15
+#define HOUSECAT_UART2_RTS_PIN     32
+#define HOUSECAT_LED_PIN           33
+#define HOUSECAT_CHAIN_OUT_PIN     33
+#define HOUSECAT_CHAIN_IN_PIN      34
+#define HOUSECAT_I2C_SCL_PIN       4
+#define HOUSECAT_I2C_SDA_PIN       16
+#define HOUSECAT_INPUT_INT_PIN     35
+#define HOUSECAT_ETH_ENABLE_PIN    13
+//#define HOUSECAT_ETH_POWER_PIN   13
+#define HOUSECAT_UART2_RX_PIN      36
+#define HOUSECAT_UART1_RX_PIN      39
 
 class housecat
 {
@@ -61,6 +61,21 @@ class housecat
     
   public:
     housecat();
+	
+	void mqttEnable();
+	
+    void modbusEnable();
+    bool modbusEnabled();
+    void mqttSetBroker(IPAddress brokerIp, int brokerPort);
+    void mqttSetBrokerCredentials(String username);
+    void mqttSetBrokerCredentials(String username, String password);
+
+    void udpEnable();
+    bool udpEnabled();
+    void udpSetAddress(int address);
+    void udpSetReceiver(int receivePort);
+    void udpSetSender(IPAddress sendIp, int sendPort);
+	
     void init();
     void poll();
     void outputsTest();
