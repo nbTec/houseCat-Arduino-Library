@@ -43,6 +43,7 @@ void setup()
   hc.modbusEnable();
 
   //hc.mqttEnable();
+  //hc.mqttSetBaseTopic("housecat");
   //hc.mqttSetBroker(IPAddress(192, 168, 1, 101), 1883);
   //hc.mqttSetBrokerCredentials("user", "password");
 

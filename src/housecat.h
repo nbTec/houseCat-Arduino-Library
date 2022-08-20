@@ -62,10 +62,11 @@ class housecat
   public:
     housecat();
 	
-	void mqttEnable();
-	
-    void modbusEnable();
+	void modbusEnable();
     bool modbusEnabled();
+	
+	void mqttEnable();
+	void mqttSetBaseTopic(String baseTopic);
     void mqttSetBroker(IPAddress brokerIp, int brokerPort);
     void mqttSetBrokerCredentials(String username);
     void mqttSetBrokerCredentials(String username, String password);

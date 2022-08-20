@@ -99,12 +99,6 @@ void housecat::heartbeatLed()
   }
 }
 
-
-
-void housecat::mqttEnable()
-{
-	g_housecat_protocol.mqttEnable();
-}
 	
 void housecat::modbusEnable()
 {
@@ -114,6 +108,17 @@ void housecat::modbusEnable()
 bool housecat::modbusEnabled()
 {
 	return g_housecat_protocol.modbusEnabled();
+}
+
+
+void housecat::mqttEnable()
+{
+	g_housecat_protocol.mqttEnable();
+}
+
+void housecat::mqttSetBaseTopic(String baseTopic)
+{
+	g_housecat_protocol.mqttSetBaseTopic(baseTopic);
 }
 	
 void housecat::mqttSetBroker(IPAddress brokerIp, int brokerPort)

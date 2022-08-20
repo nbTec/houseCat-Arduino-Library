@@ -19,6 +19,7 @@ String housecatProtocol::m_mqttReceivedPayload;
 
 housecatProtocol::housecatProtocol() {}
 
+
 void housecatProtocol::modbusEnable()
 {
   m_modbusEnabled = true;
@@ -32,12 +33,28 @@ bool housecatProtocol::modbusEnabled()
 }
 
 
-void housecatProtocol::mqttEnable()
+void housecatProtocol::mqttSetBaseTopic(String baseTopic)
 {
-  m_modbusEnabled = false;
-  m_mqttEnabled = true;
-  m_udpEnabled = false;
+  m_mqttBaseTopic = baseTopic;
 }
+
+void housecatProtocol::mqttSetBroker(IPAddress brokerIp, int brokerPort)
+{
+  m_mqttBrokerIpAddress = brokerIp;
+  m_mqttBrokerPort = brokerPort;
+}
+
+void housecatProtocol::mqttSetBrokerCredentials(String username)
+{
+  m_mqttUsername = username;
+}
+
+void housecatProtocol::mqttSetBrokerCredentials(String username, String password)
+{
+  m_mqttUsername = username;
+  m_mqttPassword = password;
+}
+
 
 void housecatProtocol::udpEnable()
 {
@@ -68,21 +85,11 @@ void housecatProtocol::udpSetSender(IPAddress sendIp, int sendPort)
 }
 
 
-void housecatProtocol::mqttSetBroker(IPAddress brokerIp, int brokerPort)
+void housecatProtocol::mqttEnable()
 {
-  m_mqttBrokerIpAddress = brokerIp;
-  m_mqttBrokerPort = brokerPort;
-}
-
-void housecatProtocol::mqttSetBrokerCredentials(String username)
-{
-  m_mqttUsername = username;
-}
-
-void housecatProtocol::mqttSetBrokerCredentials(String username, String password)
-{
-  m_mqttUsername = username;
-  m_mqttPassword = password;
+  m_modbusEnabled = false;
+  m_mqttEnabled = true;
+  m_udpEnabled = false;
 }
 
 void housecatProtocol::init()
@@ -126,9 +133,6 @@ void housecatProtocol::mqttConnect()
     m_mqttClient.connect(mqtt_client_id, mqtt_username, false);
   else
     m_mqttClient.connect(mqtt_client_id, mqtt_username, mqtt_password, false);
-    
-  m_mqttClient.subscribe("/housecat/status");
-  m_mqttClient.publish("/housecat/status", "Housecat says hello");
 
   for(int i = 1; i < sizeof(m_mqttOutputs); i++)
   {
@@ -222,7 +226,7 @@ void housecatProtocol::writeInputButtonShort(uint8_t input, bool state)
   {
     m_mqttInputsShort[input] = state;
     String input_number = String(input);
-    String mqtt_topic = m_mqttInputsTopic + input_number + m_mqttInputButtonShortSubTopic;
+    String mqtt_topic = m_mqttBaseTopic + m_mqttInputsTopic + input_number + m_mqttInputButtonShortSubTopic;
     m_mqttClient.publish(mqtt_topic, state ? "TRUE" : "FALSE");
   }
 }
@@ -241,7 +245,7 @@ void housecatProtocol::writeInputButtonLong(uint8_t input, bool state)
   {
     m_mqttInputsLong[input] = state;
     String input_number = String(input);
-    String mqtt_topic = m_mqttInputsTopic + input_number + m_mqttInputButtonLongSubTopic;
+    String mqtt_topic = m_mqttBaseTopic + m_mqttInputsTopic + input_number + m_mqttInputButtonLongSubTopic;
     m_mqttClient.publish(mqtt_topic, state ? "TRUE" : "FALSE");
   }
 }
@@ -270,7 +274,7 @@ void housecatProtocol::writeInputSensor(uint8_t input, bool state)
   {
     m_mqttInputsShort[input] = state;
     String input_number = String(input);
-    String mqtt_topic = m_mqttInputsTopic + input_number + m_mqttInputSensorSubTopic;
+    String mqtt_topic = m_mqttBaseTopic + m_mqttInputsTopic + input_number + m_mqttInputSensorSubTopic;
     m_mqttClient.publish(mqtt_topic, state ? "TRUE" : "FALSE");
   }
 }
@@ -284,7 +288,7 @@ bool housecatProtocol::addOutput(uint8_t output)
   if(m_mqttEnabled)
   {
     String output_number = String(output);
-    String mqtt_topic = m_mqttOutputsTopic + output_number;
+    String mqtt_topic = m_mqttBaseTopic + m_mqttOutputsTopic + output_number;
     return m_mqttClient.subscribe(mqtt_topic);
   }
   */
@@ -312,7 +316,7 @@ void housecatProtocol::writeOutput(uint8_t output, bool state)
   {
     m_mqttOutputs[output] = state;
     String output_number = String(output);
-    String mqtt_topic = m_mqttOutputsTopic + output_number;
+    String mqtt_topic = m_mqttBaseTopic + m_mqttOutputsTopic + output_number;
     m_mqttClient.publish(mqtt_topic, state ? "TRUE" : "FALSE");
   }
 }
@@ -376,7 +380,7 @@ void housecatProtocol::writeBlind(uint8_t output, enumProtocolBlindsState state)
   {
     m_mqttOutputs[output] = static_cast<uint8_t>(state);
     String output_number = String(output);
-    String mqtt_topic = m_mqttOutputsTopic + output_number;
+    String mqtt_topic = m_mqttBaseTopic + m_mqttOutputsTopic + output_number;
     String blind_state;
     switch(state)
     {
@@ -435,7 +439,7 @@ void housecatProtocol::writeDimmerState(uint8_t dimmer, bool state)
   {
     m_mqttDimmerStates[dimmer] = state;
     String dimmer_number = String(dimmer);
-    String mqtt_topic = m_mqttDimmersTopic + dimmer_number + m_mqttDimmersStateSubTopic;
+    String mqtt_topic = m_mqttBaseTopic + m_mqttDimmersTopic + dimmer_number + m_mqttDimmersStateSubTopic;
     m_mqttClient.publish(mqtt_topic, state ? "TRUE" : "FALSE");
   }
 }
@@ -460,7 +464,7 @@ void housecatProtocol::writeDimmerValue(uint8_t dimmer, uint8_t value)
   {
     m_mqttDimmerValues[dimmer] = value;
     String dimmer_number = String(dimmer);
-    String mqtt_topic = m_mqttDimmersTopic + dimmer_number + m_mqttDimmersValueSubTopic;
+    String mqtt_topic = m_mqttBaseTopic + m_mqttDimmersTopic + dimmer_number + m_mqttDimmersValueSubTopic;
     String mqtt_value = String(m_mqttDimmerValues[dimmer]);
     m_mqttClient.publish(mqtt_topic, mqtt_value);
   }
@@ -492,9 +496,9 @@ void housecatProtocol::poll()
       Serial.println(m_mqttReceivedPayload);
     }
 
-  if(m_mqttReceivedTopic.startsWith(m_mqttOutputsTopic))
+  if(m_mqttReceivedTopic.startsWith(m_mqttBaseTopic + m_mqttOutputsTopic))
   {
-    String output_number_substring = m_mqttReceivedTopic.substring(m_mqttOutputsTopic.length());
+    String output_number_substring = m_mqttReceivedTopic.substring(m_mqttBaseTopic.length() + m_mqttOutputsTopic.length());
     int output_number = output_number_substring.toInt();
     if((0 < output_number) && (output_number < sizeof(m_mqttOutputs)))
     {
@@ -510,9 +514,9 @@ void housecatProtocol::poll()
         m_mqttOutputs[output_number] = blind_down;
     }
   }
-  else if(m_mqttReceivedTopic.startsWith(m_mqttDimmersTopic))
+  else if(m_mqttReceivedTopic.startsWith(m_mqttBaseTopic + m_mqttDimmersTopic))
   {
-    String dimmer_substring = m_mqttReceivedTopic.substring(m_mqttDimmersTopic.length());
+    String dimmer_substring = m_mqttReceivedTopic.substring(m_mqttBaseTopic.length() + m_mqttDimmersTopic.length());
     if(m_mqttReceivedTopic.endsWith(m_mqttDimmersStateSubTopic))
     {
       String dimmer_number_substring = dimmer_substring.substring(0, dimmer_substring.length() - m_mqttDimmersStateSubTopic.length());

@@ -35,12 +35,13 @@ class housecatProtocol
     static String m_mqttReceivedPayload;
 
     String m_mqttClientId = "housecat";
-    String m_mqttInputsTopic = "/housecat/input/";
-    String m_mqttInputButtonShortSubTopic = "/short/";
-    String m_mqttInputButtonLongSubTopic = "/long/";
+	String m_mqttBaseTopic = "/housecat";
+    String m_mqttInputsTopic = "/input/";
+    String m_mqttInputButtonShortSubTopic = "/button/short/";
+    String m_mqttInputButtonLongSubTopic = "/button/long/";
     String m_mqttInputSensorSubTopic = "/sensor/";
-    String m_mqttOutputsTopic = "/housecat/output/";
-    String m_mqttDimmersTopic = "/housecat/dimmer/";
+    String m_mqttOutputsTopic = "/output/";
+    String m_mqttDimmersTopic = "/dimmer/";
     String m_mqttDimmersStateSubTopic = "/state/";
     String m_mqttDimmersValueSubTopic = "/value/";
 
@@ -75,10 +76,11 @@ class housecatProtocol
   public:
     housecatProtocol();
 
-	void mqttEnable();
-    
     void modbusEnable();
     bool modbusEnabled();
+
+	void mqttEnable();
+	void mqttSetBaseTopic(String baseTopic);
     void mqttSetBroker(IPAddress brokerIp, int brokerPort);
     void mqttSetBrokerCredentials(String username);
     void mqttSetBrokerCredentials(String username, String password);
