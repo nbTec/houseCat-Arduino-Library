@@ -137,16 +137,16 @@ void housecatProtocol::mqttConnect()
   for(int i = 1; i < sizeof(m_mqttOutputs); i++)
   {
     String output_number = String(i);
-    String mqtt_output_topic = m_mqttOutputsTopic + output_number;
+    String mqtt_output_topic = m_mqttBaseTopic + m_mqttOutputsTopic + output_number;
     m_mqttClient.subscribe(mqtt_output_topic);
   }
 
   for(int i = 1; i < sizeof(m_mqttDimmerStates); i++)
   {
     String dimmer_number = String(i);
-    String mqtt_dimmer_topic = m_mqttDimmersTopic + dimmer_number + m_mqttDimmersStateSubTopic;
+    String mqtt_dimmer_topic = m_mqttBaseTopic + m_mqttDimmerSubTopic + dimmer_number + m_mqttDimmerStateSubTopic;
     m_mqttClient.subscribe(mqtt_dimmer_topic);
-    mqtt_dimmer_topic = m_mqttDimmersTopic + dimmer_number + m_mqttDimmersValueSubTopic;
+    mqtt_dimmer_topic = m_mqttBaseTopic + m_mqttDimmerSubTopic + dimmer_number + m_mqttDimmerValueSubTopic;
     m_mqttClient.subscribe(mqtt_dimmer_topic);
   }
 }
@@ -439,7 +439,7 @@ void housecatProtocol::writeDimmerState(uint8_t dimmer, bool state)
   {
     m_mqttDimmerStates[dimmer] = state;
     String dimmer_number = String(dimmer);
-    String mqtt_topic = m_mqttBaseTopic + m_mqttDimmersTopic + dimmer_number + m_mqttDimmersStateSubTopic;
+    String mqtt_topic = m_mqttBaseTopic + m_mqttDimmerSubTopic + dimmer_number + m_mqttDimmerStateSubTopic;
     m_mqttClient.publish(mqtt_topic, state ? "TRUE" : "FALSE");
   }
 }
@@ -464,7 +464,7 @@ void housecatProtocol::writeDimmerValue(uint8_t dimmer, uint8_t value)
   {
     m_mqttDimmerValues[dimmer] = value;
     String dimmer_number = String(dimmer);
-    String mqtt_topic = m_mqttBaseTopic + m_mqttDimmersTopic + dimmer_number + m_mqttDimmersValueSubTopic;
+    String mqtt_topic = m_mqttBaseTopic + m_mqttDimmerSubTopic + dimmer_number + m_mqttDimmerValueSubTopic;
     String mqtt_value = String(m_mqttDimmerValues[dimmer]);
     m_mqttClient.publish(mqtt_topic, mqtt_value);
   }
@@ -514,12 +514,12 @@ void housecatProtocol::poll()
         m_mqttOutputs[output_number] = blind_down;
     }
   }
-  else if(m_mqttReceivedTopic.startsWith(m_mqttBaseTopic + m_mqttDimmersTopic))
+  else if(m_mqttReceivedTopic.startsWith(m_mqttBaseTopic + m_mqttDimmerSubTopic))
   {
-    String dimmer_substring = m_mqttReceivedTopic.substring(m_mqttBaseTopic.length() + m_mqttDimmersTopic.length());
-    if(m_mqttReceivedTopic.endsWith(m_mqttDimmersStateSubTopic))
+    String dimmer_substring = m_mqttReceivedTopic.substring(m_mqttBaseTopic.length() + m_mqttDimmerSubTopic.length());
+    if(m_mqttReceivedTopic.endsWith(m_mqttDimmerStateSubTopic))
     {
-      String dimmer_number_substring = dimmer_substring.substring(0, dimmer_substring.length() - m_mqttDimmersStateSubTopic.length());
+      String dimmer_number_substring = dimmer_substring.substring(0, dimmer_substring.length() - m_mqttDimmerStateSubTopic.length());
       int dimmer_number = dimmer_number_substring.toInt();
       if((0 < dimmer_number) && (dimmer_number < sizeof(m_mqttDimmerStates)))
       {
@@ -529,9 +529,9 @@ void housecatProtocol::poll()
           m_mqttDimmerStates[dimmer_number] = false;
       }
     }
-    else if(m_mqttReceivedTopic.endsWith(m_mqttDimmersValueSubTopic))
+    else if(m_mqttReceivedTopic.endsWith(m_mqttDimmerValueSubTopic))
     {
-      String dimmer_number_substring = dimmer_substring.substring(0, dimmer_substring.length() - m_mqttDimmersStateSubTopic.length());
+      String dimmer_number_substring = dimmer_substring.substring(0, dimmer_substring.length() - m_mqttDimmerStateSubTopic.length());
       int dimmer_number = dimmer_number_substring.toInt();
       if((0 < dimmer_number) && (dimmer_number < sizeof(m_mqttDimmerStates)))
       {

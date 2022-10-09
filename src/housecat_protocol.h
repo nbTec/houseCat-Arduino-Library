@@ -41,9 +41,11 @@ class housecatProtocol
     String m_mqttInputButtonLongSubTopic = "/button/long/";
     String m_mqttInputSensorSubTopic = "/sensor/";
     String m_mqttOutputsTopic = "/output/";
-    String m_mqttDimmersTopic = "/dimmer/";
-    String m_mqttDimmersStateSubTopic = "/state/";
-    String m_mqttDimmersValueSubTopic = "/value/";
+	String m_mqttOutputRelaySubTopic = "/relay/";
+	String m_mqttOutputBlindSubTopic = "/blind/";
+    String m_mqttDimmerSubTopic = "/dimmer/";
+    String m_mqttDimmerStateSubTopic = "/state/";
+    String m_mqttDimmerValueSubTopic = "/value/";
 
     static const uint8_t m_digital_inputs = 64;
     static const uint8_t m_digital_outputs = 64;
