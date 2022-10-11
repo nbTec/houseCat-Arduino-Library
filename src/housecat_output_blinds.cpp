@@ -56,14 +56,12 @@ void housecatOutputBlinds::poll(bool upInput, bool downInput)
 			m_blindsState = start_down;
 			m_protocolInternalState = blind_down;
 			g_housecat_protocol.writeBlind(m_outputNumber_1, m_protocolInternalState);
-			//Serial.println("start_down");
 		}
 		if (up_pressed)
 		{
 			m_blindsState = start_up;
 			m_protocolInternalState = blind_up;
 			g_housecat_protocol.writeBlind(m_outputNumber_1, m_protocolInternalState);
-			//Serial.println("start_up");
 		}
 		
 		if(!g_housecat_protocol.modbusEnabled()) //Modbus only has binary state
@@ -72,13 +70,11 @@ void housecatOutputBlinds::poll(bool upInput, bool downInput)
 			{
 				m_blindsState = start_down;
 				m_protocolInternalState = protocolExternalState;
-				//Serial.println("start_down_protocol");
 			}	
 			if(protocol_up)
 			{
 				m_blindsState = start_up;
 				m_protocolInternalState = protocolExternalState;
-				//Serial.println("start_up_protocol");
 			}
 		}
 		
@@ -91,22 +87,16 @@ void housecatOutputBlinds::poll(bool upInput, bool downInput)
 		if(!g_housecat_protocol.modbusEnabled())
 			g_housecat_protocol.writeBlind(m_outputNumber_1, m_protocolInternalState);
 		m_blindsState = going_down;
-		//Serial.println("going_down");
 	  	break;
 
 	  case going_down:
 		if (down_pressed or protocol_stop)
 		{
 			m_blindsState = stop;
-			//Serial.println("stop");
 		}
 		if (up_pressed or protocol_stop)
 		{
-			//relaysStop();
-			//m_prvTimeMs = readTimeMs();
-			//m_blindsState = switch_direction_down_to_up;
 			m_blindsState = stop;
-			//Serial.println("stop");
 		}
 		if((readTimeSec() - m_prvTimeSec) >= m_travelTimeSec)
 		{
@@ -114,7 +104,6 @@ void housecatOutputBlinds::poll(bool upInput, bool downInput)
 			m_protocolInternalState = blind_closed;
 			g_housecat_protocol.writeBlind(m_outputNumber_1, m_protocolInternalState);
 			m_blindsState = closed;
-			//Serial.println("closed");
 		}
 	  	break;
 	  
@@ -122,7 +111,6 @@ void housecatOutputBlinds::poll(bool upInput, bool downInput)
 	  	if (up_pressed or protocol_up)
 		{
 			m_blindsState = start_up;
-			//Serial.println("start_up");
 		}
 	  	break;
 	
@@ -145,16 +133,11 @@ void housecatOutputBlinds::poll(bool upInput, bool downInput)
 	  case going_up:
 	  	if (down_pressed or protocol_stop)
 		{
-			//relaysStop();
-			//m_prvTimeMs = readTimeMs();
-			//m_blindsState = switch_direction_up_to_down;
 			m_blindsState = stop;
-			//Serial.println("stop");
 		}
 		if (up_pressed or protocol_stop)
 		{
 			m_blindsState = stop;
-			//Serial.println("stop");
 		}
 		if((readTimeSec() - m_prvTimeSec) >= m_travelTimeSec)
 		{
@@ -162,7 +145,6 @@ void housecatOutputBlinds::poll(bool upInput, bool downInput)
 	  		m_protocolInternalState = blind_open;
 			g_housecat_protocol.writeBlind(m_outputNumber_1, m_protocolInternalState);
 			m_blindsState = open;
-			//Serial.println("open");
 		}
 	  	break;
 
@@ -170,7 +152,6 @@ void housecatOutputBlinds::poll(bool upInput, bool downInput)
 	  	if (down_pressed or protocol_down)
 		{
 			m_blindsState = start_down;
-			//Serial.println("start_down");
 		}
 	  	break;
 
