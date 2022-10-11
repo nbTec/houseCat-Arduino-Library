@@ -1,4 +1,4 @@
-Library for creating Arduino home automation applications on the nbTec houseCat ESP32 powered centralized home automation controller.
+Library for creating Arduino home automation applications on the [nbTec houseCat ESP32 powered centralized home automation controller](https://nbtec.be/en/product/housecat-esp32-home-automation-gateway/).
 
 *   [Programming](#GatewayArduinomanual-Programming)
     *   [Protocol](#GatewayArduinomanual-Protocol)
@@ -27,7 +27,6 @@ Library for creating Arduino home automation applications on the nbTec houseCat 
             *   [Modbus Control](#GatewayArduinomanual-ModbusControl.2)
             *   [MQTT Control](#GatewayArduinomanual-MQTTControl.2)
 
-**
 
 Programming
 ===========
