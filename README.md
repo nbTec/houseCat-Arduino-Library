@@ -1,31 +1,31 @@
 Library for creating Arduino home automation applications on the [nbTec houseCat ESP32 powered centralized home automation controller](https://nbtec.be/en/product/housecat-esp32-home-automation-gateway/).
 
 *   [Programming](#Programming)
-    *   [Protocol](#Protocol)
-        *   [Modbus](#Modbus)
-        *   [MQTT](#MQTT)
-        *   [UDP](#UDP)
-            *   [Inputs](#Inputs)
-            *   [Ouputs](#Ouputs)
-            *   [Analog outputs](#Analogoutputs)
-        *   [Inputs](#Inputs.1)
-        *   [Button](#Button)
-            *   [Modbus Readout](#ModbusReadout)
-            *   [MQTT Readout](#MQTTReadout)
-        *   [Sensor](#Sensor)
-            *   [Modbus Readout](#ModbusReadout.1)
-            *   [MQTT Readout](#MQTTReadout.1)
-    *   [Outputs](#Outputs)
-        *   [Relay](#Relay)
-            *   [Modbus Control](#ModbusControl)
-            *   [MQTT Control](#MQTTControl)
-        *   [Blind](#Blind)
-            *   [Modbus Control](#ModbusControl.1)
-            *   [MQTT Control](#MQTTControl.1)
-    *   [Analog Outputs](#AnalogOutputs)
-        *   [Dimmer](#Dimmer)
-            *   [Modbus Control](#ModbusControl.2)
-            *   [MQTT Control](#MQTTControl.2)
+*   [Protocol](#Protocol)
+	*   [Modbus](#Modbus)
+	*   [MQTT](#MQTT)
+	*   [UDP](#UDP)
+		*   [Inputs](#Inputs)
+		*   [Ouputs](#Ouputs)
+		*   [Analog outputs](#Analogoutputs)
+*   [Inputs](#Inputs.1)
+	*   [Button](#Button)
+		*   [Modbus Readout](#ModbusReadout)
+		*   [MQTT Readout](#MQTTReadout)
+	*   [Sensor](#Sensor)
+		*   [Modbus Readout](#ModbusReadout.1)
+		*   [MQTT Readout](#MQTTReadout.1)
+*   [Outputs](#Outputs)
+	*   [Relay](#Relay)
+		*   [Modbus Control](#ModbusControl)
+		*   [MQTT Control](#MQTTControl)
+	*   [Blind](#Blind)
+		*   [Modbus Control](#ModbusControl.1)
+		*   [MQTT Control](#MQTTControl.1)
+*   [Analog Outputs](#AnalogOutputs)
+	*   [Dimmer](#Dimmer)
+		*   [Modbus Control](#ModbusControl.2)
+		*   [MQTT Control](#MQTTControl.2)
 
 
 Programming
@@ -68,13 +68,13 @@ Protocol
 
 For the time being, one out of three protocols can be enabled for use over the ethernet/wifi interface.
 
-# Modbus
+## Modbus
 
 ```cpp
 hc.modbusEnable();
 ```
 
-# MQTT
+## MQTT
 
 ```cpp
 hc.mqttEnable();
@@ -83,7 +83,7 @@ hc.mqttSetBroker(IPAddress(192, 168, 1, 101), 1883);
 hc.mqttSetBrokerCredentials("user", "password");
 ```
 
-# UDP
+## UDP
 
 ```cpp
 hc.udpEnable();
@@ -96,7 +96,7 @@ By sending strings to the receive port which is set by udpSetReceiver, the outpu
 Changes on the inputs will be sent to the IP address and port set by udpSetSender.  
 The strings use spaces as a delimiter between variables.
 
-## Inputs
+### Inputs
 
 ```cpp
 housecat1 din64 0
@@ -108,7 +108,7 @@ housecat1 din64 1
 *   64: Digital input number (1 to 64)
 *   0/1: Input state (0: low, 1: high)
 
-## Ouputs
+### Ouputs
 
 ```cpp
 housecat1 dout64 0
@@ -120,7 +120,7 @@ housecat1 dout64 1
 *   64: Digital output number (1 to 64)
 *   0/1: Output state (0: low, 1: high)
 
-## Analog outputs
+### Analog outputs
 
 ```cpp
 housecat1 aout8 0
@@ -135,7 +135,7 @@ housecat1 aout8 255
 Inputs
 ======
 
-# Button
+## Button
 
 **Declaration**
 
@@ -163,12 +163,12 @@ button_name.longPress();
 These boolean outputs can be used at any location in your code, for example inside a housecatOutputRelay poll function in order to toggle an output following a short button press.  
 The longPress() output will remain high as long as the button is pressed.
 
-## Modbus Readout
+### Modbus Readout
 
 Short press status is linked to a discrete input, the address is the input\_number used in the creation of the button.  
 Long press status has an offset of 64 to the short press address.
 
-## MQTT Readout
+### MQTT Readout
 
 Short or long press states (FALSE: off, TRUE: on) are published to the following channel patterns.
 
@@ -179,7 +179,7 @@ Short or long press states (FALSE: off, TRUE: on) are published to the following
 
 *   64: Input number (1 to 64)
 
-# Sensor
+## Sensor
 
 **Declaration**
 
@@ -205,11 +205,11 @@ button_name.pulse();
 
 This boolean output can be used at any location in your code, for example inside a housecatOutputRelay poll function in order to toggle an output following a sensor pulse.
 
-## Modbus Readout
+### Modbus Readout
 
 Sensor status is linked to a discrete input, the address is the input\_number used in the creation of the sensor.
 
-## MQTT Readout
+### MQTT Readout
 
 The state of the sensor (FALSE: off, TRUE: on) is published to the following channel pattern.
 
@@ -222,7 +222,7 @@ The state of the sensor (FALSE: off, TRUE: on) is published to the following cha
 Outputs
 =======
 
-# Relay
+## Relay
 
 **Declaration**
 
@@ -268,12 +268,12 @@ Add these for all your relays into the outputPolling() function.
 
 Unused parameters can be disabled using a false constant (see last example).
 
-## Modbus Control
+### Modbus Control
 
 Relay status is linked to a coil (0: off, 1: on), the address of the coil is the output\_number used in the creation of the relay.  
 Writing to the coil will change the state of the relay.
 
-## MQTT Control
+### MQTT Control
 
 The state of the relay (FALSE: off, TRUE: on) is published to the following channel pattern by the Housecat on changes.  
 External devices can publish TRUE or FALSE to the same topic to be able to control the relay.  
@@ -285,7 +285,7 @@ External devices can publish TRUE or FALSE to the same topic to be able to contr
 
 *   64: Output number (1 to 64)
 
-# Blind
+## Blind
 
 **Declaration**
 
@@ -314,12 +314,12 @@ Add these for all your blinds into the outputPolling() function.
 
 You can "or" multiple inputs if the blind needs to be controlled by multiple buttons.
 
-## Modbus Control
+### Modbus Control
 
 Blind status is linked to a coil (0: open, 1: closed), the address of the coil is the on\_off\_output\_number used in the creation of the blind.  
 Writing to the coil will change the state of the blind.
 
-## MQTT Control
+### MQTT Control
 
 The state of the blind is published to the following channel pattern by the Housecat on changes:
 
@@ -344,7 +344,7 @@ External devices can publish to the same topic to be able to control the blind.
 Analog Outputs
 ==============
 
-# Dimmer
+## Dimmer
 
 **Declaration**
 
@@ -368,14 +368,14 @@ Add these for all your dimmers into the outputPolling() function.
 
 You can "or" multiple inputs if the blind needs to be controlled by multiple buttons.
 
-## Modbus Control
+### Modbus Control
 
 The dimmer output state (0: disabled, 1: enabled) is linked to a coil, the address of the coil is the analog\_output\_pin\_number used in the creation of the dimmer + 64.  
 Writing to the coil will change the state of the dimmer output.  
 The dimmer value (0: 0V, 100: 10V) is linked to a holding register, the address of the register is the analog\_output\_pin\_number used in the creation of the dimmer.  
 Writing to the register will change the state of the dimmer value.
 
-## MQTT Control
+### MQTT Control
 
 TRUE or FALSE corresponding to the state of the dimmer output is published to the dimmer state channel pattern by the Housecat on changes.  
 External devices can publish TRUE or FALSE to the same topic to be able to control the dimmer output.  
