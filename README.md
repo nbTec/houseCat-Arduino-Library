@@ -34,7 +34,6 @@ Programming
 *   Download and install the Arduino IDE
     *   [https://www.arduino.cc/en/software](https://www.arduino.cc/en/software)
 *   Install the houseCat library together with the following libraries
-    *   [https://github.com/nbTec/houseCat-Arduino-Library](https://github.com/nbTec/houseCat-Arduino-Library)
     *   [https://github.com/emelianov/modbus-esp8266](https://github.com/emelianov/modbus-esp8266)
     *   [https://github.com/256dpi/arduino-mqtt](https://github.com/256dpi/arduino-mqtt)
 *   Power the Housecat and connect the USB port to your computer
