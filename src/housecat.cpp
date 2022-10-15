@@ -25,7 +25,7 @@ void housecatNetworkEvent(WiFiEvent_t event)
   switch (event) {
     case ARDUINO_EVENT_ETH_START:
       Serial.println("ETH Started");
-      ETH.setHostname(housecat_hostname);
+      ETH.setHostname(HOUSECAT_HOSTNAME);
       break;
     case ARDUINO_EVENT_ETH_CONNECTED:
       Serial.println("ETH Connected");
@@ -166,6 +166,8 @@ void housecat::init()
   Serial.begin(115200);
   
   ethernetInit();
+
+  m_housecatOta.init();
   
   pinMode(HOUSECAT_LED_PIN, OUTPUT);
   pinMode(HOUSECAT_UART1_RTS_PIN, OUTPUT);
@@ -193,6 +195,8 @@ void housecat::init()
 
 void housecat::poll()
 {
+  m_housecatOta.poll();
+
   heartbeatLed();
   inputHandler();
 

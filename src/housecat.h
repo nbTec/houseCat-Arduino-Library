@@ -5,6 +5,8 @@
 #include <HardwareSerial.h>
 #include <ETH.h>
 
+#include "housecat_ota.h"
+
 #include "housecat_protocol.h"
 
 #include "housecat_onewire.h"
@@ -32,7 +34,8 @@ extern HardwareSerial hcSerial2;
 
 extern housecatOneWire hcOneWire;
 
-#define housecat_hostname  "housecat"
+#define HOUSECAT_HOSTNAME         "housecat"
+#define HOUSECAT_OTA_PORT          80
 
 #define HOUSECAT_ONEWIRE_SLEW_PIN  2
 #define HOUSECAT_ONEWIRE_PIN       5
@@ -54,6 +57,8 @@ extern housecatOneWire hcOneWire;
 class housecat
 {
   private:
+    housecatOta m_housecatOta;
+
     void ethernetInit();
     void inputInterruptInit();
     void inputHandler();
@@ -62,11 +67,11 @@ class housecat
   public:
     housecat();
 	
-	void modbusEnable();
+	  void modbusEnable();
     bool modbusEnabled();
 	
-	void mqttEnable();
-	void mqttSetBaseTopic(String baseTopic);
+	  void mqttEnable();
+	  void mqttSetBaseTopic(String baseTopic);
     void mqttSetBroker(IPAddress brokerIp, int brokerPort);
     void mqttSetBrokerCredentials(String username);
     void mqttSetBrokerCredentials(String username, String password);
