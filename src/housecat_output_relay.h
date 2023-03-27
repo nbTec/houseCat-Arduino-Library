@@ -23,8 +23,8 @@ class housecatOutputRelay
     bool m_firstPoll = true;
     bool m_toggleInputPrv = false;
     bool m_resetInputPrv = false;
-    bool m_motionInputPrv = false;
     bool m_panicInputPrv = false;
+    bool m_motionInputPrv = false;
 
     unsigned long readTimeSec();
 
