@@ -19,7 +19,7 @@ housecatOutputBlinds::housecatOutputBlinds(uint8_t outputNumber_1, uint8_t outpu
 
 }
 
-void housecatOutputBlinds::invertDirection(bool state)
+void housecatOutputBlinds::invertDirection(bool state = true)
 {
 	m_invertDirection = state;
 }
