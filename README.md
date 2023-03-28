@@ -252,7 +252,7 @@ relay_name.poll(buttonHallway_1.shortPress() or buttonHallway_2.shortPress());
 relay_name.poll(buttonHallway_1.shortPress() or buttonHallway_2.shortPress(), buttonAllOff.longPress());
 relay_name.poll(buttonHallway_1.shortPress() or buttonHallway_2.shortPress(), buttonAllOff.longPress(), buttonPanic.longPress());
 relay_name.poll(buttonHallway_1.shortPress() or buttonHallway_2.shortPress(), buttonAllOff.longPress(), buttonPanic.longPress(), motionSensorHallway.pulse());
-relay_name.poll(buttonHallway_1.shortPress() or buttonHallway_2.shortPress(), buttonAllOff.longPress(), false, motionSensorHallway.pulse())
+relay_name.poll(buttonHallway_1.shortPress() or buttonHallway_2.shortPress(), buttonAllOff.longPress(), buttonPanic.longPress(), motionSensorHallway.pulse())
 ```
 
 Add these for all your relays into the outputPolling() function.
@@ -313,7 +313,7 @@ teleruptor_name.poll(buttonHallway_1.shortPress() or buttonHallway_2.shortPress(
 teleruptor_name.poll(buttonHallway_1.shortPress() or buttonHallway_2.shortPress(), buttonAllOff.longPress());
 teleruptor_name.poll(buttonHallway_1.shortPress() or buttonHallway_2.shortPress(), buttonAllOff.longPress(), buttonPanic.longPress());
 teleruptor_name.poll(buttonHallway_1.shortPress() or buttonHallway_2.shortPress(), buttonAllOff.longPress(), buttonPanic.longPress(), motionSensorHallway.pulse());
-teleruptor_name.poll(buttonHallway_1.shortPress() or buttonHallway_2.shortPress(), buttonAllOff.longPress(), false, motionSensorHallway.pulse())
+teleruptor_name.poll(buttonHallway_1.shortPress() or buttonHallway_2.shortPress(), buttonAllOff.longPress(), buttonPanic.longPress(), motionSensorHallway.pulse())
 ```
 
 Add these for all your teleruptors into the outputPolling() function.
@@ -430,6 +430,10 @@ Sets the turn on time of the dimmer when using a sensor pulse input in the follo
 
 ```cpp
 dimmer_name.poll(buttonLivingroomLight.shortPress(), buttonLivingroomLight.longPress());
+dimmer_name.poll(buttonLivingroomLight.shortPress(), buttonLivingroomLight.longPress(), buttonAllOff.longPress());
+dimmer_name.poll(buttonLivingroomLight.shortPress(), buttonLivingroomLight.longPress(), buttonAllOff.longPress(), buttonPanic.longPress());
+dimmer_name.poll(buttonLivingroomLight.shortPress(), buttonLivingroomLight.longPress(), buttonAllOff.longPress(), buttonPanic.longPress(), motionSensorHallway.pulse());
+dimmer_name.poll(buttonLivingroomLight.shortPress(), buttonLivingroomLight.longPress(), buttonAllOff.longPress(), buttonPanic.longPress(), motionSensorHallway.pulse())
 ```
 
 Add these for all your dimmers into the outputPolling() function.
