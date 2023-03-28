@@ -86,7 +86,7 @@ hc.mqttSetBrokerCredentials("user", "password");
 
 ```cpp
 hc.udpEnable();
-hc.udpSetAddress(1);   
+hc.udpSetAddress(1);
 hc.udpSetReceiver(55555); hc.udpSetSender(IPAddress(192, 168, 1, 101), 44444);
 ```
 
@@ -239,8 +239,6 @@ relay_name.enableAutoOff(auto_off_time_seconds);
 
 Enables turning off the relay automatically after the specified time in seconds
 
-**Configuration**
-
 ```cpp
 relay_name.enableMotion(turn_on_time_seconds);
 ```
@@ -276,6 +274,67 @@ Writing to the coil will change the state of the relay.
 
 The state of the relay (FALSE: off, TRUE: on) is published to the following channel pattern by the Housecat on changes.  
 External devices can publish TRUE or FALSE to the same topic to be able to control the relay.  
+  
+
+```cpp
+/housecat/output/64/
+```
+
+*   64: Output number (1 to 64)
+
+## Teleruptor
+
+**Declaration**
+
+```cpp
+housecatOutputTeleruptor teleruptor_name(output_number);
+```
+
+Used to control a teleruptor that is connected to a digital output.
+
+**Configuration**
+
+```cpp
+teleruptor_name.enableAutoOff(auto_off_time_seconds);
+```
+
+Enables turning off the teleruptor automatically after the specified time in seconds
+
+```cpp
+teleruptor_name.enableMotion(turn_on_time_seconds);
+```
+
+Sets the turn on time of the teleruptor when using a sensor pulse input in the following poll function.
+
+**Polling**
+
+```cpp
+teleruptor_name.poll(buttonHallway_1.shortPress() or buttonHallway_2.shortPress());
+teleruptor_name.poll(buttonHallway_1.shortPress() or buttonHallway_2.shortPress(), buttonAllOff.longPress());
+teleruptor_name.poll(buttonHallway_1.shortPress() or buttonHallway_2.shortPress(), buttonAllOff.longPress(), buttonPanic.longPress());
+teleruptor_name.poll(buttonHallway_1.shortPress() or buttonHallway_2.shortPress(), buttonAllOff.longPress(), buttonPanic.longPress(), motionSensorHallway.pulse());
+teleruptor_name.poll(buttonHallway_1.shortPress() or buttonHallway_2.shortPress(), buttonAllOff.longPress(), false, motionSensorHallway.pulse())
+```
+
+Add these for all your teleruptors into the outputPolling() function.
+
+*   Parameter 1 (bool): Toggle input, you can "or" multiple inputs if the teleruptor needs to be controlled by multiple buttons.
+*   Parameter 2 (bool): Reset input, can be used for "all off" functionality.
+*   Parameter 3 (bool): On input, can be used for "all on/panic" functionality.
+*   Parameter 4 (bool): Sensor input, this can contain a pulse() output of a sensor mentioned earlier, a pulse on this input will turn on the teleruptor and start the Motion timer configured earlier.
+    *   Subsequent pulses will reset the timer and keep the teleruptor turned on.
+
+Unused parameters can be disabled using a false constant (see last example).
+
+### Modbus Control
+
+Teleruptor status is linked to a coil (0: off, 1: on), the address of the coil is the output\_number used in the creation of the teleruptor.  
+Writing to the coil will change the state of the teleruptor.
+
+### MQTT Control
+
+The state of the teleruptor (FALSE: off, TRUE: on) is published to the following channel pattern by the Housecat on changes.  
+External devices can publish TRUE or FALSE to the same topic to be able to control the teleruptor.  
   
 
 ```cpp
@@ -353,6 +412,20 @@ housecatAnalogOutputDimmer dimmer_name(analog_output_pin_number, start_percentag
 
 Used to control an analog output to generate 0 to 10V signals for controlling external dimmers.
 
+**Configuration**
+
+```cpp
+dimmer_name.enableAutoOff(auto_off_time_seconds);
+```
+
+Enables turning off the dimmer automatically after the specified time in seconds
+
+```cpp
+dimmer_name.enableMotion(turn_on_time_seconds);
+```
+
+Sets the turn on time of the dimmer when using a sensor pulse input in the following poll function.
+
 **Polling**
 
 ```cpp
@@ -364,8 +437,12 @@ Add these for all your dimmers into the outputPolling() function.
 *   Parameter 1 (bool): Toggle input
 *   Parameter 2 (bool): Dimmer setting input, when this input is high the dimmer setting will shift by 10% intervals.  
     *   A longPress() of a button can be used for this input.
+*   Parameter 3 (bool): Reset input, can be used for "all off" functionality.
+*   Parameter 4 (bool): On input, can be used for "all on/panic" functionality.
+*   Parameter 5 (bool): Sensor input, this can contain a pulse() output of a sensor mentioned earlier, a pulse on this input will turn on the dimmer and start the Motion timer configured earlier.
+    *   Subsequent pulses will reset the timer and keep the dimmer turned on.
 
-You can "or" multiple inputs if the blind needs to be controlled by multiple buttons.
+Unused parameters can be disabled using a false constant (see last example).
 
 ### Modbus Control
 

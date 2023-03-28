@@ -24,6 +24,12 @@ unsigned long housecatOutputRelay::readTimeSec()
   return (millis() / 1000);
 }
 
+void housecatOutputRelay::handleOutputState()
+{
+  g_housecat_protocol.addOutput(m_outputNumber);
+  g_housecat_protocol.writeOutput(m_outputNumber, m_outputState);
+}
+
 void housecatOutputRelay::enableAutoOff(unsigned long time)
 {
   m_autoOff = true;
@@ -53,17 +59,24 @@ void housecatOutputRelay::poll(bool toggleInput)
   if (m_firstPoll)
   {
     m_outputState = g_housecat_outputs.read(m_outputNumber); //Update output state
-    g_housecat_protocol.addOutput(m_outputNumber);
-    g_housecat_protocol.writeOutput(m_outputNumber, m_outputState);
+    handleOutputState();
     m_firstPoll = false;
   }
 
   if (toggle_pressed)
   {
     m_outputState = !m_outputState;
-    g_housecat_outputs.write(m_outputNumber, m_outputState);
-    g_housecat_protocol.writeOutput(m_outputNumber, m_outputState);
-    m_motionActive = false;
+    handleOutputState();
+
+    if(m_outputState)
+    {
+      m_motionActive = false;
+    }
+    else
+    {
+      m_motionActive = true;
+    }
+    
     m_autoOffStartTime = readTimeSec();
   }
 
@@ -72,7 +85,16 @@ void housecatOutputRelay::poll(bool toggleInput)
   {
     m_outputState = protocol_state;
     g_housecat_outputs.write(m_outputNumber, m_outputState);
-    m_motionActive = false;
+
+    if(m_outputState)
+    {
+      m_motionActive = false;
+    }
+    else
+    {
+      m_motionActive = true;
+    }
+
     m_autoOffStartTime = readTimeSec();
   }
 
@@ -81,8 +103,7 @@ void housecatOutputRelay::poll(bool toggleInput)
     if(m_autoOff && ((readTimeSec() - m_autoOffStartTime) >= m_autoOffTime))
     {
       m_outputState = false;
-      g_housecat_outputs.write(m_outputNumber, m_outputState);
-      g_housecat_protocol.writeOutput(m_outputNumber, m_outputState);
+      handleOutputState();
     }
   }
 
@@ -96,8 +117,8 @@ void housecatOutputRelay::poll(bool toggleInput, bool resetInput)
   if(reset_pressed)
   {
     m_outputState = false;
-    g_housecat_outputs.write(m_outputNumber, m_outputState);
-    g_housecat_protocol.writeOutput(m_outputNumber, m_outputState);
+    handleOutputState();
+    m_motionActive = true;
   }
 
   m_resetInputPrv = resetInput;
@@ -111,10 +132,21 @@ void housecatOutputRelay::poll(bool toggleInput, bool resetInput, bool panicInpu
 
   if(panic_pressed)
   {
-    m_outputState = true;
-    g_housecat_outputs.write(m_outputNumber, m_outputState);
-    g_housecat_protocol.writeOutput(m_outputNumber, m_outputState);
-    m_motionActive = false;
+    if(m_panicActive == false)
+    {
+      m_stateBeforePanic = m_outputState;
+      m_outputState = true;
+      handleOutputState();
+      m_motionActive = false;
+      m_panicActive = true;
+    }
+    else
+    {
+      m_outputState = m_stateBeforePanic;
+      handleOutputState();
+      m_motionActive = true;
+      m_panicActive = true;
+    }
   }
   
   m_panicInputPrv = panicInput;
@@ -124,28 +156,49 @@ void housecatOutputRelay::poll(bool toggleInput, bool resetInput, bool panicInpu
 
 void housecatOutputRelay::poll(bool toggleInput, bool resetInput, bool panicInput, bool motionInput)
 {
-  uint8_t motion_pulse = motionInput && (!m_motionInputPrv);
+  bool motion_pulse = motionInput && (!m_motionInputPrv);
+  bool motion_active_enabled = m_motionActive && (!m_motionActivePrv);
 
   if(m_motion)
   {
-    if(motion_pulse && (m_outputState == false))
+    if(m_motionActive == true)
     {
-      m_motionActive = true;
-      m_outputState = true;
-      g_housecat_outputs.write(m_outputNumber, m_outputState);
-      g_housecat_protocol.writeOutput(m_outputNumber, m_outputState);
-      m_motionStartTime = readTimeSec();
-    }
+      if(motion_active_enabled)
+      {
+        m_motionHoldoffStartTime = readTimeSec();
+        m_motionHoldoffActive = true;
+      }
+      else
+      {
+        if(m_motionHoldoffActive == true)
+        {
+          if((readTimeSec() - m_motionHoldoffStartTime) >= m_motionHoldoffTime)
+          {
+            m_motionHoldoffActive = false;
+          }
+        }
+        else
+        {
+          if(motion_pulse && (m_outputState == false))
+          {
+            m_motionRunning = true;
+            m_outputState = true;
+            handleOutputState();
+            m_motionStartTime = readTimeSec();
+          }
 
-    if(m_motionActive && ((readTimeSec() - m_motionStartTime) >= m_motionTime))
-    {
-      m_outputState = false;
-      g_housecat_outputs.write(m_outputNumber, m_outputState);
-      g_housecat_protocol.writeOutput(m_outputNumber, m_outputState);
-      m_motionActive = false;
+          if(m_motionRunning && ((readTimeSec() - m_motionStartTime) >= m_motionTime))
+          {
+            m_outputState = false;
+            handleOutputState();
+            m_motionRunning = false;
+          }
+        }
+      }
     }
   }
   
+  m_motionActivePrv = m_motionActive;
   m_motionInputPrv = motionInput;
 
   poll(toggleInput, resetInput, panicInput);

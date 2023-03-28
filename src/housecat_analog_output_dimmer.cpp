@@ -28,6 +28,33 @@ unsigned long housecatAnalogOutputDimmer::readTimeSec()
   return (millis() / 1000);
 }
 
+void housecatAnalogOutputDimmer::analogOutputHandler()
+{
+  
+}
+
+void housecatAnalogOutputDimmer::enableAutoOff(unsigned long time)
+{
+  m_autoOff = true;
+  m_autoOffTime = time;
+}
+
+void housecatAnalogOutputDimmer::disableAutoOff()
+{
+  m_autoOff = false;
+}
+
+void housecatAnalogOutputDimmer::enableMotion(unsigned long time)
+{
+  m_motion = true;
+  m_motionTime = time;
+}
+
+void housecatAnalogOutputDimmer::disableMotion()
+{
+  m_motion = false;
+}
+
 void housecatAnalogOutputDimmer::poll(bool toggleInput, bool cycleInput)
 {
   uint8_t toggle_pressed = toggleInput && (!m_toggleInputPrv);
@@ -43,15 +70,16 @@ void housecatAnalogOutputDimmer::poll(bool toggleInput, bool cycleInput)
   if (toggle_pressed)
   {
     m_outputState = !m_outputState;
-    m_motionActive = false;
     
     if(m_outputState == true)
     {
+      m_motionActive = false;
       g_housecat_analog_outputs.write(m_outputNumber, m_outputValue / m_analogOutputDivider);
       m_autoOffStartTime = readTimeSec();
     }
     else
     {
+      m_motionActive = true;
       g_housecat_analog_outputs.write(m_outputNumber, 0.0);
     }
     g_housecat_protocol.writeDimmerState(m_outputNumber, m_outputState);
@@ -78,13 +106,14 @@ void housecatAnalogOutputDimmer::poll(bool toggleInput, bool cycleInput)
   if(m_outputState != protocol_state)
   {
     m_outputState = protocol_state;
-    m_motionActive = false;
     if(m_outputState == true)
     {
+      m_motionActive = false;
       g_housecat_analog_outputs.write(m_outputNumber, m_outputValue / m_analogOutputDivider);
     }
     else
     {
+      m_motionActive = true;
       g_housecat_analog_outputs.write(m_outputNumber, 0.0);
     }
   }
@@ -96,6 +125,16 @@ void housecatAnalogOutputDimmer::poll(bool toggleInput, bool cycleInput)
     if(m_outputState == true)
     {
       g_housecat_analog_outputs.write(m_outputNumber, m_outputValue / m_analogOutputDivider);
+    }
+  }
+
+  if(m_outputState)
+  {
+    if(m_autoOff && ((readTimeSec() - m_autoOffStartTime) >= m_autoOffTime))
+    {
+      m_outputState = false;
+      g_housecat_analog_outputs.write(m_outputNumber, 0.0);
+      g_housecat_protocol.writeDimmerState(m_outputNumber, m_outputState);
     }
   }
 
@@ -125,8 +164,28 @@ void housecatAnalogOutputDimmer::poll(bool toggleInput, bool cycleInput, bool re
 
   if(panic_pressed)
   {
-    m_outputState = true;
-    g_housecat_analog_outputs.write(m_outputNumber, m_outputValue / m_analogOutputDivider);
+    if(m_panicActive == false)
+    {
+      m_stateBeforePanic = m_outputState;
+      m_outputState = true;
+      g_housecat_analog_outputs.write(m_outputNumber, m_outputValue / m_analogOutputDivider);
+      m_panicActive = true;
+    }
+    else
+    {
+      m_outputState = m_stateBeforePanic;
+
+      if(m_outputState)
+      {
+        g_housecat_analog_outputs.write(m_outputNumber, m_outputValue / m_analogOutputDivider);
+      }
+      else
+      {
+        g_housecat_analog_outputs.write(m_outputNumber, 0.0);
+      }
+
+      m_panicActive = false;
+    }
     g_housecat_protocol.writeDimmerState(m_outputNumber, m_outputState);
   }
 
@@ -137,29 +196,52 @@ void housecatAnalogOutputDimmer::poll(bool toggleInput, bool cycleInput, bool re
 
 void housecatAnalogOutputDimmer::poll(bool toggleInput, bool cycleInput, bool resetInput, bool panicInput, bool motionInput)
 {
-  uint8_t motion_pulse = motionInput && (!m_motionInputPrv);
+  bool motion_pulse = motionInput && (!m_motionInputPrv);
+  bool motion_active_enabled = m_motionActive && (!m_motionActivePrv);
 
   if(m_motion)
   {
-    if(motion_pulse && (m_outputState == false))
+    if(m_motionActive == true)
     {
-      m_motionActive = true;
-      m_outputState = true;
-      g_housecat_analog_outputs.write(m_outputNumber, m_outputValue / m_analogOutputDivider);
-      g_housecat_protocol.writeOutput(m_outputNumber, m_outputState);
-      m_motionStartTime = readTimeSec();
-    }
+      if(motion_active_enabled)
+      {
+        m_motionHoldoffStartTime = readTimeSec();
+        m_motionHoldoffActive = true;
+      }
+      else
+      {
+        if(m_motionHoldoffActive == true)
+        {
+          if((readTimeSec() - m_motionHoldoffStartTime) >= m_motionHoldoffTime)
+          {
+            m_motionHoldoffActive = false;
+          }
+        }
+        else
+        {
+          if(motion_pulse && (m_outputState == false))
+          {
+            m_motionRunning = true;
+            m_outputState = true;
+            g_housecat_analog_outputs.write(m_outputNumber, m_outputValue / m_analogOutputDivider);
+            g_housecat_protocol.writeOutput(m_outputNumber, m_outputState);
+            m_motionStartTime = readTimeSec();
+          }
 
-    if(m_motionActive && ((readTimeSec() - m_motionStartTime) >= m_motionTime))
-    {
-      m_outputState = false;
-      g_housecat_analog_outputs.write(m_outputNumber, 0.0);
-      g_housecat_protocol.writeOutput(m_outputNumber, m_outputState);
-      m_motionActive = false;
+          if(m_motionRunning && ((readTimeSec() - m_motionStartTime) >= m_motionTime))
+          {
+            m_outputState = false;
+            g_housecat_analog_outputs.write(m_outputNumber, 0.0);
+            g_housecat_protocol.writeOutput(m_outputNumber, m_outputState);
+            m_motionRunning = false;
+          }
+        }
+      }
     }
   }
   
+  m_motionActivePrv = m_motionActive;
   m_motionInputPrv = motionInput;
 
-  poll(toggleInput, cycleInput, resetInput, panicInput);
+  poll(toggleInput, resetInput, panicInput);
 }

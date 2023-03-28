@@ -40,7 +40,8 @@ void housecatOutputTeleruptor::pulseHandler()
   else if((readTimeMilliSec() - m_pulseStartTimeMs) >= m_pulseTimeMs)
   {
     g_housecat_protocol.writeOutput(m_outputNumber, false);
-    m_pulseInProgress = true;
+    m_outputStatePrevious = m_outputState;
+    m_pulseInProgress = false;
   }
 }
 
@@ -72,16 +73,23 @@ void housecatOutputTeleruptor::poll(bool toggleInput)
     
   if (m_firstPoll)
   {
-    g_housecat_protocol.addOutput(m_outputNumber);
-    g_housecat_protocol.writeOutput(m_outputNumber, m_outputState);
+    m_outputState = g_housecat_outputs.read(m_outputNumber); //Update output state
     m_firstPoll = false;
   }
 
   if (toggle_pressed)
   {
     m_outputState = !m_outputState;
-    g_housecat_protocol.writeOutput(m_outputNumber, m_outputState);
-    m_motionActive = false;
+
+    if(m_outputState)
+    {
+      m_motionActive = false;
+    }
+    else
+    {
+      m_motionActive = true;
+    }
+    
     m_autoOffStartTime = readTimeSec();
   }
 
@@ -89,7 +97,16 @@ void housecatOutputTeleruptor::poll(bool toggleInput)
   if(protocol_state != m_outputState)
   {
     m_outputState = protocol_state;
-    m_motionActive = false;
+
+    if(m_outputState)
+    {
+      m_motionActive = false;
+    }
+    else
+    {
+      m_motionActive = true;
+    }
+
     m_autoOffStartTime = readTimeSec();
   }
 
@@ -98,11 +115,8 @@ void housecatOutputTeleruptor::poll(bool toggleInput)
     if(m_autoOff && ((readTimeSec() - m_autoOffStartTime) >= m_autoOffTime))
     {
       m_outputState = false;
-      g_housecat_protocol.writeOutput(m_outputNumber, m_outputState);
     }
   }
-
-  pulseHandler();
 
   m_toggleInputPrv = toggleInput;
 }
@@ -114,7 +128,7 @@ void housecatOutputTeleruptor::poll(bool toggleInput, bool resetInput)
   if(reset_pressed)
   {
     m_outputState = false;
-    g_housecat_protocol.writeOutput(m_outputNumber, m_outputState);
+    m_motionActive = true;
   }
 
   m_resetInputPrv = resetInput;
@@ -128,9 +142,19 @@ void housecatOutputTeleruptor::poll(bool toggleInput, bool resetInput, bool pani
 
   if(panic_pressed)
   {
-    m_outputState = true;
-    g_housecat_protocol.writeOutput(m_outputNumber, m_outputState);
-    m_motionActive = false;
+    if(m_panicActive == false)
+    {
+      m_stateBeforePanic = m_outputState;
+      m_outputState = true;
+      m_motionActive = false;
+      m_panicActive = true;
+    }
+    else
+    {
+      m_outputState = m_stateBeforePanic;
+      m_motionActive = true;
+      m_panicActive = true;
+    }
   }
   
   m_panicInputPrv = panicInput;
@@ -140,26 +164,47 @@ void housecatOutputTeleruptor::poll(bool toggleInput, bool resetInput, bool pani
 
 void housecatOutputTeleruptor::poll(bool toggleInput, bool resetInput, bool panicInput, bool motionInput)
 {
-  uint8_t motion_pulse = motionInput && (!m_motionInputPrv);
+  bool motion_pulse = motionInput && (!m_motionInputPrv);
+  bool motion_active_enabled = m_motionActive && (!m_motionActivePrv);
 
   if(m_motion)
   {
-    if(motion_pulse && (m_outputState == false))
+    if(m_motionActive == true)
     {
-      m_motionActive = true;
-      m_outputState = true;
-      g_housecat_protocol.writeOutput(m_outputNumber, m_outputState);
-      m_motionStartTime = readTimeSec();
-    }
+      if(motion_active_enabled)
+      {
+        m_motionHoldoffStartTime = readTimeSec();
+        m_motionHoldoffActive = true;
+      }
+      else
+      {
+        if(m_motionHoldoffActive == true)
+        {
+          if((readTimeSec() - m_motionHoldoffStartTime) >= m_motionHoldoffTime)
+          {
+            m_motionHoldoffActive = false;
+          }
+        }
+        else
+        {
+          if(motion_pulse && (m_outputState == false))
+          {
+            m_motionRunning = true;
+            m_outputState = true;
+            m_motionStartTime = readTimeSec();
+          }
 
-    if(m_motionActive && ((readTimeSec() - m_motionStartTime) >= m_motionTime))
-    {
-      m_outputState = false;
-      g_housecat_protocol.writeOutput(m_outputNumber, m_outputState);
-      m_motionActive = false;
+          if(m_motionRunning && ((readTimeSec() - m_motionStartTime) >= m_motionTime))
+          {
+            m_outputState = false;
+            m_motionRunning = false;
+          }
+        }
+      }
     }
   }
   
+  m_motionActivePrv = m_motionActive;
   m_motionInputPrv = motionInput;
 
   poll(toggleInput, resetInput, panicInput);

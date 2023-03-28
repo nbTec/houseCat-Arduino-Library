@@ -27,7 +27,15 @@ class housecatAnalogOutputDimmer
     bool m_motion = false;
     unsigned long m_motionStartTime = 0;
     unsigned long m_motionTime = 60;
+    unsigned long m_motionHoldoffStartTime = 0;
+    unsigned long m_motionHoldoffTime = 5;
+    bool m_motionHoldoffActive = false;
     bool m_motionActive = false;
+    bool m_motionActivePrv = false;
+    bool m_motionRunning = false;
+
+    bool m_stateBeforePanic = false;
+    bool m_panicActive = false;
 
     bool m_firstPoll = true;
     bool m_toggleInputPrv = false;
@@ -39,8 +47,16 @@ class housecatAnalogOutputDimmer
     unsigned long readTimeMs();
     unsigned long readTimeSec();
 
+    void analogOutputHandler();
+
   public:
     housecatAnalogOutputDimmer(uint8_t outputNumber, uint8_t startValue, uint8_t defaultValue);
+
+    void enableAutoOff(unsigned long time);
+    void disableAutoOff();
+    
+    void enableMotion(unsigned long time);
+    void disableMotion();
 
     void poll(bool toggleInput, bool cycleInput);
     void poll(bool toggleInput, bool cycleInput, bool resetInput);
