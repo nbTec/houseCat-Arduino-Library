@@ -26,7 +26,7 @@ unsigned long housecatOutputRelay::readTimeSec()
 
 void housecatOutputRelay::handleOutputState()
 {
-  g_housecat_protocol.addOutput(m_outputNumber);
+  g_housecat_outputs.write(m_outputNumber, m_outputState);
   g_housecat_protocol.writeOutput(m_outputNumber, m_outputState);
 }
 
@@ -59,7 +59,8 @@ void housecatOutputRelay::poll(bool toggleInput)
   if (m_firstPoll)
   {
     m_outputState = g_housecat_outputs.read(m_outputNumber); //Update output state
-    handleOutputState();
+    g_housecat_protocol.addOutput(m_outputNumber);
+    g_housecat_protocol.writeOutput(m_outputNumber, m_outputState);
     m_firstPoll = false;
   }
 

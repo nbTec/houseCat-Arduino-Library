@@ -33,12 +33,14 @@ void housecatOutputTeleruptor::pulseHandler()
 {
   if((m_outputState != m_outputStatePrevious) & !m_pulseInProgress)
   {
+    g_housecat_outputs.write(m_outputNumber, true);
     g_housecat_protocol.writeOutput(m_outputNumber, true);
     m_pulseStartTimeMs = readTimeMilliSec();
     m_pulseInProgress = true;
   }
   else if((readTimeMilliSec() - m_pulseStartTimeMs) >= m_pulseTimeMs)
   {
+    g_housecat_outputs.write(m_outputNumber, false);
     g_housecat_protocol.writeOutput(m_outputNumber, false);
     m_outputStatePrevious = m_outputState;
     m_pulseInProgress = false;
